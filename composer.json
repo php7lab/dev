@@ -11,7 +11,11 @@
   "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
-      "PhpLab\\Dev\\": "src",
+      "PhpLab\\Dev\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
       "PhpLab\\Dev\\Tests\\": "tests"
     }
   }
