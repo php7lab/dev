@@ -2,7 +2,7 @@
 
 namespace PhpLab\Dev\Package\Domain\Repositories\File;
 
-use PhpLab\Core\Domain\Data\Query;
+use PhpLab\Core\Domain\Libs\Query;
 use PhpLab\Core\Domain\Interfaces\Repository\ReadRepositoryInterface;
 use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
 use PhpLab\Core\Libs\Store\StoreFile;

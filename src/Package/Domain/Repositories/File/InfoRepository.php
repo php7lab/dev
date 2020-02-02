@@ -13,7 +13,7 @@ use php7tool\vendor\domain\filters\IsIgnoreFilter;
 use php7tool\vendor\domain\filters\IsPackageFilter;
 use php7tool\vendor\domain\helpers\RepositoryHelper;
 use php7tool\vendor\domain\helpers\UseHelper;
-use PhpLab\Core\Domain\Data\Query;
+use PhpLab\Core\Domain\Libs\Query;
 use PhpLab\Core\Domain\Helpers\EntityHelper;
 use PhpLab\Core\Exceptions\InvalidArgumentException;
 use PhpLab\Core\Libs\ArrayTools\Helpers\ArrayIterator;

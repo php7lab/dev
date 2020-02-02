@@ -5,7 +5,7 @@ namespace PhpLab\Dev\Package\Domain\Repositories\File;
 use Illuminate\Support\Collection;
 use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
-use PhpLab\Core\Domain\Data\Query;
+use PhpLab\Core\Domain\Libs\Query;
 use PhpLab\Dev\Package\Domain\Entities\GroupEntity;
 use PhpLab\Dev\Package\Domain\Entities\PackageEntity;
 use PhpLab\Dev\Package\Domain\Interfaces\Repositories\PackageRepositoryInterface;
