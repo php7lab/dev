@@ -9,6 +9,9 @@
     }
   ],
   "minimum-stability": "dev",
+  "require": {
+    "zendframework/zend-code": "^3.3.0"
+  },
   "autoload": {
     "psr-4": {
       "PhpLab\\Dev\\": "src",
