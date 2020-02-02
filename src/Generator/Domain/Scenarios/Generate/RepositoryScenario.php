@@ -2,6 +2,7 @@
 
 namespace PhpLab\Dev\Generator\Domain\Scenarios\Generate;
 
+use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
 use PhpLab\Core\Legacy\Code\entities\ClassEntity;
 use PhpLab\Core\Legacy\Code\entities\ClassUseEntity;
 use PhpLab\Core\Legacy\Code\entities\ClassVariableEntity;
@@ -78,8 +79,13 @@ class RepositoryScenario extends BaseScenario
         $fileGenerator->setNamespace($this->domainNamespace . '\\' . $this->classDir() . '\\' . $driverDirName);
 
         $parentClass = $this->parentClass($driver);
-        $fileGenerator->setUse($parentClass);
-        $classGenerator->setExtendedClass(basename($parentClass));
+        if($parentClass) {
+            $fileGenerator->setUse($parentClass);
+            $classGenerator->setExtendedClass(basename($parentClass));
+        } else {
+            $fileGenerator->setUse(ForgeEntityTrait::class);
+            $classGenerator->addUse('ForgeEntityTrait');
+        }
 
         $classGenerator->setName($className);
         if ($this->isMakeInterface()) {
@@ -135,7 +141,7 @@ $uses[] = new ClassUseEntity(['name' => $entityFullClassName]);
                 $className = 'PhpLab\Eloquent\Db\Base\BaseEloquentRepository';
             }
         } else {
-            $className = 'PhpLab\Core\Domain\Base\BaseRepository';
+            //$className = 'PhpLab\Core\Domain\Base\BaseRepository';
         }
         return $className;
     }

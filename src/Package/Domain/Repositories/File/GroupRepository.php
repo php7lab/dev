@@ -4,12 +4,14 @@ namespace PhpLab\Dev\Package\Domain\Repositories\File;
 
 use PhpLab\Core\Domain\Data\Query;
 use PhpLab\Core\Domain\Interfaces\Repository\ReadRepositoryInterface;
-use PhpLab\Core\Domain\Base\BaseRepository;
+use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
 use PhpLab\Core\Libs\Store\StoreFile;
 use PhpLab\Dev\Package\Domain\Entities\GroupEntity;
 
-class GroupRepository extends BaseRepository implements ReadRepositoryInterface
+class GroupRepository implements ReadRepositoryInterface
 {
+
+    use ForgeEntityTrait;
 
     private $fileName;
 

@@ -3,25 +3,31 @@
 namespace PhpLab\Dev\Package\Domain\Repositories\File;
 
 use Illuminate\Support\Collection;
+use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Core\Domain\Data\Query;
-use PhpLab\Core\Domain\Base\BaseRepository;
 use PhpLab\Dev\Package\Domain\Entities\GroupEntity;
 use PhpLab\Dev\Package\Domain\Entities\PackageEntity;
 use PhpLab\Dev\Package\Domain\Interfaces\Repositories\PackageRepositoryInterface;
 
-class PackageRepository extends BaseRepository implements PackageRepositoryInterface
+class PackageRepository implements PackageRepositoryInterface
 {
+
+    use ForgeEntityTrait;
 
     const VENDOR_DIR = __DIR__ . '/../../../../../../..';
 
     protected $tableName = '';
-    protected $entityClass = PackageEntity::class;
     private $groupRepostory;
 
     public function __construct(GroupRepository $groupRepostory)
     {
         $this->groupRepostory = $groupRepostory;
+    }
+
+    public function getEntityClass(): string
+    {
+        return PackageEntity::class;
     }
 
     public function all(Query $query = null)

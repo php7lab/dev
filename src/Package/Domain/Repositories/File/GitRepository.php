@@ -4,7 +4,7 @@ namespace PhpLab\Dev\Package\Domain\Repositories\File;
 
 use Illuminate\Support\Collection;
 use PhpLab\Core\Domain\Helpers\EntityHelper;
-use PhpLab\Core\Domain\Base\BaseRepository;
+use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
 use PhpLab\Dev\Package\Domain\Entities\CommitEntity;
 use PhpLab\Dev\Package\Domain\Entities\GitEntity;
 use PhpLab\Dev\Package\Domain\Entities\PackageEntity;
@@ -12,18 +12,24 @@ use PhpLab\Dev\Package\Domain\Entities\TagEntity;
 use PhpLab\Dev\Package\Domain\Interfaces\Repositories\GitRepositoryInterface;
 use PhpLab\Dev\Package\Domain\Libs\GitShell;
 
-class GitRepository extends BaseRepository implements GitRepositoryInterface
+class GitRepository implements GitRepositoryInterface
 {
+
+    use ForgeEntityTrait;
 
     const VENDOR_DIR = __DIR__ . '/../../../../../../..';
 
     protected $tableName = '';
-    protected $entityClass = GitEntity::class;
     private $packageRepostory;
 
     public function __construct(PackageRepository $packageRepostory)
     {
         $this->packageRepostory = $packageRepostory;
+    }
+
+    public function getEntityClass(): string
+    {
+        return GitEntity::class;
     }
 
     public function isHasChanges(PackageEntity $packageEntity): bool
