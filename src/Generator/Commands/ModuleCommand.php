@@ -32,20 +32,20 @@ class ModuleCommand extends BaseGeneratorCommand
 
     private function input(InputInterface $input, OutputInterface $output, BuildDto $buildDto)
     {
-        $buildDto->moduleNamespace = 'App\\Api';
+        /*$buildDto->moduleNamespace = 'App\\Api';
         $buildDto->typeModule = 'api';
-        /*$buildDto->moduleNamespace = 'App\\Web';
-        $buildDto->typeModule = 'web';*/
+        //$buildDto->moduleNamespace = 'App\\Web';
+        //$buildDto->typeModule = 'web';
 
         $buildDto->moduleName = 'app';
         $buildDto->name = 'qwerty';
         $buildDto->endpoint = 'qwerty';
 
-        return;
+        return;*/
 
-        $this->runInputScenario(NameInputScenario::class, $input, $output, $buildDto);
         $this->runInputScenario(ModuleNamespaceInputScenario::class, $input, $output, $buildDto);
         $this->runInputScenario(TypeModuleInputScenario::class, $input, $output, $buildDto);
+        $this->runInputScenario(NameInputScenario::class, $input, $output, $buildDto);
     }
 
 }

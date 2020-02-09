@@ -38,7 +38,7 @@ class DomainCommand extends BaseGeneratorCommand
 
     private function input(InputInterface $input, OutputInterface $output, BuildDto $buildDto)
     {
-        $buildDto->domainNamespace = 'App\\Domain';
+        /*$buildDto->domainNamespace = 'App\\Domain';
         $buildDto->domainName = 'app';
         $buildDto->types = array_keys($buildDto->typeArray);
         $buildDto->name = 'qwerty';
@@ -49,7 +49,7 @@ class DomainCommand extends BaseGeneratorCommand
             'eloquent',
             'file',
         ];
-        return;
+        return;*/
 
 
         $this->runInputScenario(DomainNamespaceInputScenario::class, $input, $output, $buildDto);
