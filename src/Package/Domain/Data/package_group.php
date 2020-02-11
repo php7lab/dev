@@ -52,6 +52,66 @@ return [
         ],
     ],
     [
+        'name' => 'zndoc',
+        'provider_name' => 'github',
+        'authors' => [
+            [
+                'name' => 'Yamshikov Vitaliy',
+                'email' => 'theyamshikov@yandex.ru',
+            ],
+        ],
+    ],
+    [
+        'name' => 'zndev',
+        'provider_name' => 'github',
+        'authors' => [
+            [
+                'name' => 'Yamshikov Vitaliy',
+                'email' => 'theyamshikov@yandex.ru',
+            ],
+        ],
+    ],
+    [
+        'name' => 'znlab',
+        'provider_name' => 'github',
+        'authors' => [
+            [
+                'name' => 'Yamshikov Vitaliy',
+                'email' => 'theyamshikov@yandex.ru',
+            ],
+        ],
+    ],
+    [
+        'name' => 'znsandbox',
+        'provider_name' => 'github',
+        'authors' => [
+            [
+                'name' => 'Yamshikov Vitaliy',
+                'email' => 'theyamshikov@yandex.ru',
+            ],
+        ],
+    ],
+    [
+        'name' => 'zntool',
+        'provider_name' => 'github',
+        'authors' => [
+            [
+                'name' => 'Yamshikov Vitaliy',
+                'email' => 'theyamshikov@yandex.ru',
+            ],
+        ],
+    ],
+    [
+        'name' => 'zntpl',
+        'provider_name' => 'github',
+        'authors' => [
+            [
+                'name' => 'Yamshikov Vitaliy',
+                'email' => 'theyamshikov@yandex.ru',
+            ],
+        ],
+    ],
+    [
         'name' => 'yubundle',
         'provider_name' => 'gitlab',
         'authors' => [
