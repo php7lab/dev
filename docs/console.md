@@ -1,13 +1,33 @@
 # Команды консоли
 
-## Незакомиченные изменения пакетов composer
+## Управление пакетами
 
-    php vendor/php7lab/dev/bin/console package:git:changed
+Переходим в папку `bin`:
 
-## Пакеты, нуждающиеся в выпуске релиза
+    cd vendor/php7lab/dev/bin
 
-    php vendor/php7lab/dev/bin/console package:git:need-release
+Незакомиченные изменения пакетов composer:
 
-## Стянуть все пакеты
+    php console package:git:changed
 
-    php vendor/php7lab/dev/bin/console package:git:pull
+Пакеты, нуждающиеся в выпуске релиза:
+
+    php console package:git:need-release
+
+Стянуть все пакеты:
+
+    php console package:git:pull
+
+## Генератор
+
+Переходим в папку `bin`:
+
+    cd vendor/php7lab/dev/bin
+
+Генерация домена (service, repository, entity, migration, interface):
+
+    php console generator:domain
+
+Генерация модуля (API, Web, Console):
+
+    php console generator:module
