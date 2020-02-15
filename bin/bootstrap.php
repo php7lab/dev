@@ -45,7 +45,7 @@ use PhpLab\Dev\Package\Domain\Repositories\File\PackageRepository;
 use PhpLab\Dev\Package\Domain\Services\GitService;
 use PhpLab\Dev\Package\Domain\Services\PackageService;
 
-$fileName = $_ENV['PACKAGE_GROUP_CONFIG'] ? __DIR__ . '/../../../../' . $_ENV['PACKAGE_GROUP_CONFIG'] : __DIR__ . '/../src/Package/Domain/Data/package_group.php';
+$fileName = !empty($_ENV['PACKAGE_GROUP_CONFIG']) ? __DIR__ . '/../../../../' . $_ENV['PACKAGE_GROUP_CONFIG'] : __DIR__ . '/../src/Package/Domain/Data/package_group.php';
 $groupRepository = new GroupRepository($fileName);
 $packageRepository = new PackageRepository($groupRepository);
 $gitRepository = new GitRepository($packageRepository);
