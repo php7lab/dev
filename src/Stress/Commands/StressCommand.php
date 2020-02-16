@@ -27,7 +27,7 @@ class StressCommand extends Command
 
         $synchQueryCount = 20; // кол-во параллельных запросов
         $ageCount = 5; // кол-во эпох теста
-        $baseUrl = $_ENV['API_DOMAIN_URL'];
+        $baseUrl = $_ENV['API_URL'];
         $url = $baseUrl . '/php/v1/article';
 
         /** @var TestEntity[] $queryCollection */
