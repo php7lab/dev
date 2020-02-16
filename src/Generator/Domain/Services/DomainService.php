@@ -14,7 +14,7 @@ class DomainService implements DomainServiceInterface
     public function generate(BuildDto $buildDto)
     {
         foreach ($buildDto->types as $typeName) {
-            $type = $buildDto->typeArray[$typeName];
+            $type = $typeName;
             $type = Inflector::classify($type);
             $scenarioInstance = $this->createScenarioByTypeName($type);
             $scenarioParams = [

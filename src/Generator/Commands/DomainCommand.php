@@ -68,17 +68,15 @@ class DomainCommand extends BaseGeneratorCommand
         $this->runInputScenario(TypeInputScenario::class, $input, $output, $buildDto);
         $this->runInputScenario(NameInputScenario::class, $input, $output, $buildDto);
 
-        $typesFlip = array_flip($buildDto->typeArray);
-
-        if (in_array($typesFlip['entity'], $buildDto->types)) {
+        if (in_array('entity', $buildDto->types)) {
             $this->runInputScenario(EntityAttributesInputScenario::class, $input, $output, $buildDto);
         }
 
-        if (in_array($typesFlip['service'], $buildDto->types)) {
+        if (in_array('service', $buildDto->types)) {
             $this->runInputScenario(IsCrudServiceInputScenario::class, $input, $output, $buildDto);
         }
 
-        if (in_array($typesFlip['repository'], $buildDto->types)) {
+        if (in_array('repository', $buildDto->types)) {
             $this->runInputScenario(DriverInputScenario::class, $input, $output, $buildDto);
             $this->runInputScenario(IsCrudRepositoryInputScenario::class, $input, $output, $buildDto);
         }
