@@ -421,7 +421,9 @@ class GitShell extends BaseShell
     public function pullWithInfo($remote = null)
     {
         $result = $this->extractFromCommand("git pull $remote", 'trim');
-        $result = implode(PHP_EOL, $result);
+        if(is_array($result)) {
+            $result = implode(PHP_EOL, $result);
+        }
         $result = trim($result);
         return $result;
     }
