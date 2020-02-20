@@ -42,7 +42,10 @@ class GitChangedCommand extends BaseCommand
             $packageId = $packageEntity->getId();
             $output->write(" $packageId ... ");
             $isHasChanges = $this->gitService->isHasChanges($packageEntity);
-            if ($isHasChanges) {
+            $isGit = is_file($packageEntity->getDirectory() . '/.git/config');
+            if( ! $isGit) {
+                $output->writeln("<fg=magenta>Not found git repository</>");
+            } elseif ($isHasChanges) {
                 $output->writeln("<fg=yellow>Has changes</>");
                 $totalCollection->add($packageEntity);
             } else {

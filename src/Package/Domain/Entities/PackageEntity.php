@@ -2,7 +2,9 @@
 
 namespace PhpLab\Dev\Package\Domain\Entities;
 
-class PackageEntity
+use PhpLab\Core\Domain\Interfaces\Entity\EntityIdInterface;
+
+class PackageEntity implements EntityIdInterface
 {
 
     private $id;
@@ -13,6 +15,10 @@ class PackageEntity
     public function getId()
     {
         return $this->group->name . '/' . $this->name;
+    }
+
+    public function setId($id)
+    {
     }
 
     public function getName()

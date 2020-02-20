@@ -3,6 +3,7 @@
 namespace PhpLab\Dev\Package\Domain\Repositories\File;
 
 use Illuminate\Support\Collection;
+use PhpLab\Core\Domain\Interfaces\Entity\EntityIdInterface;
 use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Core\Domain\Libs\Query;
@@ -43,7 +44,10 @@ class PackageRepository implements PackageRepositoryInterface
                 $packageEntity = new PackageEntity;
                 $packageEntity->setName($name);
                 $packageEntity->setGroup($groupEntity);
-                $collection->add($packageEntity);
+                $isPackage = is_dir($packageEntity->getDirectory()) && is_file($packageEntity->getDirectory() . '/composer.json');
+                if($isPackage) {
+                    $collection->add($packageEntity);
+                }
             }
         }
         return $collection;
@@ -54,7 +58,7 @@ class PackageRepository implements PackageRepositoryInterface
         return count($this->all($query));
     }
 
-    public function oneById($id, Query $query = null)
+    public function oneById($id, Query $query = null): EntityIdInterface
     {
         // TODO: Implement oneById() method.
     }

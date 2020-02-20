@@ -2,7 +2,9 @@
 
 namespace PhpLab\Dev\Package\Domain\Entities;
 
-class GitEntity
+use PhpLab\Core\Domain\Interfaces\Entity\EntityIdInterface;
+
+class GitEntity implements EntityIdInterface
 {
 
     private $id;

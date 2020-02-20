@@ -2,6 +2,7 @@
 
 namespace PhpLab\Dev\Package\Domain\Repositories\File;
 
+use PhpLab\Core\Domain\Interfaces\Entity\EntityIdInterface;
 use PhpLab\Core\Domain\Libs\Query;
 use PhpLab\Core\Domain\Interfaces\Repository\ReadRepositoryInterface;
 use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
@@ -34,7 +35,7 @@ class GroupRepository implements ReadRepositoryInterface
         return $collection->count();
     }
 
-    public function oneById($id, Query $query = null)
+    public function oneById($id, Query $query = null): EntityIdInterface
     {
         // TODO: Implement oneById() method.
     }
