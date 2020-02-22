@@ -13,6 +13,7 @@ use PhpLab\Dev\Generator\Domain\Dto\BuildDto;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;
 use Zend\Code\Generator\InterfaceGenerator;
+use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\PropertyGenerator;
 
 class EntityScenario extends BaseScenario
@@ -40,10 +41,22 @@ class EntityScenario extends BaseScenario
         $fileGenerator = new FileGenerator;
         $classGenerator = new ClassGenerator;
         $classGenerator->setName($className);
-        if ($this->isMakeInterface()) {
-            $classGenerator->setImplementedInterfaces([$this->getInterfaceName()]);
-            $fileGenerator->setUse($this->getInterfaceFullName());
+
+        $implementedInterfaces = [];
+        $fileGenerator->setUse('Symfony\Component\Validator\Constraints', 'Assert');
+        $fileGenerator->setUse('PhpLab\Core\Domain\Interfaces\Entity\ValidateEntityInterface');
+        $implementedInterfaces[] = 'ValidateEntityInterface';
+
+        if(in_array('id', $this->attributes)) {
+            $fileGenerator->setUse('PhpLab\Core\Domain\Interfaces\Entity\EntityIdInterface');
+            $implementedInterfaces[] = 'EntityIdInterface';
         }
+
+        $classGenerator->setImplementedInterfaces($implementedInterfaces);
+
+        $validateBody = 'return [];';
+        $classGenerator->addMethod('validationRules', [], [], $validateBody);
+
         if ($this->attributes) {
             foreach ($this->attributes as $attribute) {
                 $attributeName = Inflector::variablize($attribute);
