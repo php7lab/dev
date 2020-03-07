@@ -12,6 +12,16 @@ return [
         ],
     ],
     [
+        'name' => 'php7bundle',
+        'provider_name' => 'github',
+        'authors' => [
+            [
+                'name' => 'Yamshikov Vitaliy',
+                'email' => 'theyamshikov@yandex.ru',
+            ],
+        ],
+    ],
+    [
         'name' => 'php7example',
         'provider_name' => 'github',
         'authors' => [
