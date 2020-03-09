@@ -2,6 +2,7 @@
 
 namespace PhpLab\Dev\Generator\Domain\Scenarios\Generate;
 
+use PhpLab\Core\Domain\Interfaces\Service\CrudServiceInterface;
 use PhpLab\Core\Legacy\Code\entities\ClassEntity;
 use PhpLab\Core\Legacy\Code\entities\ClassUseEntity;
 use PhpLab\Core\Legacy\Code\entities\ClassVariableEntity;
@@ -43,7 +44,7 @@ class ServiceScenario extends BaseScenario
         $interfaceGenerator = new InterfaceGenerator;
         $interfaceGenerator->setName($this->getInterfaceName());
         if ($this->buildDto->isCrudService) {
-            $fileGenerator->setUse('PhpLab\Core\Domain\Interfaces\Service\CrudServiceInterface');
+            $fileGenerator->setUse(CrudServiceInterface::class);
             $interfaceGenerator->setImplementedInterfaces(['CrudServiceInterface']);
         }
         $fileGenerator->setNamespace($this->domainNamespace . '\\' . $this->interfaceDir());
@@ -76,6 +77,8 @@ class ServiceScenario extends BaseScenario
         }
 
         $repositoryInterfaceFullClassName = $this->buildDto->domainNamespace . LocationHelper::fullInterfaceName($this->name, TypeEnum::REPOSITORY);
+        $repositoryInterfacePureClassName = basename($repositoryInterfaceFullClassName);
+        $fileGenerator->setUse($repositoryInterfaceFullClassName);
         //$repositoryInterfaceClassName = basename($repositoryInterfaceFullClassName);
         //$fileGenerator->setUse($repositoryInterfaceFullClassName);
 
@@ -100,7 +103,7 @@ class ServiceScenario extends BaseScenario
 
         $parameterGenerator = new ParameterGenerator;
         $parameterGenerator->setName('repository');
-        $parameterGenerator->setType($repositoryInterfaceFullClassName);
+        $parameterGenerator->setType($repositoryInterfacePureClassName);
 
         $methodGenerator = new MethodGenerator;
         $methodGenerator->setName('__construct');
@@ -116,7 +119,10 @@ class ServiceScenario extends BaseScenario
     }
 ";*/
 
-        ClassHelper::generateFile($fileGenerator->getNamespace() . '\\' . $className, $fileGenerator->generate());
+        $phpCode = $fileGenerator->generate();
+        $phpCode = str_replace('public function __construct(\\', 'public function __construct(', $phpCode);
+
+        ClassHelper::generateFile($fileGenerator->getNamespace() . '\\' . $className, $phpCode);
 
 
         /*$className = $this->getClassName();

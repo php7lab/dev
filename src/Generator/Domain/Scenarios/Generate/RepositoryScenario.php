@@ -2,7 +2,8 @@
 
 namespace PhpLab\Dev\Generator\Domain\Scenarios\Generate;
 
-use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
+use PhpLab\Core\Domain\Interfaces\Repository\CrudRepositoryInterface;
+use PhpLab\Core\Domain\Interfaces\Repository\RepositoryInterface;
 use PhpLab\Core\Legacy\Code\entities\ClassEntity;
 use PhpLab\Core\Legacy\Code\entities\ClassUseEntity;
 use PhpLab\Core\Legacy\Code\entities\ClassVariableEntity;
@@ -11,9 +12,12 @@ use PhpLab\Core\Legacy\Code\helpers\ClassHelper;
 use PhpLab\Core\Legacy\Yii\Helpers\Inflector;
 use PhpLab\Dev\Generator\Domain\Enums\TypeEnum;
 use PhpLab\Dev\Generator\Domain\Helpers\LocationHelper;
+use PhpLab\Eloquent\Db\Base\BaseEloquentCrudRepository;
+use PhpLab\Eloquent\Db\Base\BaseEloquentRepository;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;
 use Zend\Code\Generator\InterfaceGenerator;
+use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\PropertyGenerator;
 
 class RepositoryScenario extends BaseScenario
@@ -42,23 +46,15 @@ class RepositoryScenario extends BaseScenario
         $interfaceGenerator = new InterfaceGenerator;
         $interfaceGenerator->setName($this->getInterfaceName());
         if ($this->buildDto->isCrudRepository) {
-            $fileGenerator->setUse('PhpLab\Core\Domain\Interfaces\Repository\CrudRepositoryInterface');
+            $fileGenerator->setUse(CrudRepositoryInterface::class);
             $interfaceGenerator->setImplementedInterfaces(['CrudRepositoryInterface']);
+        } else {
+            $fileGenerator->setUse(RepositoryInterface::class);
+            $interfaceGenerator->setImplementedInterfaces(['RepositoryInterface']);
         }
         $fileGenerator->setNamespace($this->domainNamespace . '\\' . $this->interfaceDir());
         $fileGenerator->setClass($interfaceGenerator);
         ClassHelper::generateFile($fileGenerator->getNamespace() . '\\' . $this->getInterfaceName(), $fileGenerator->generate());
-
-
-        /*$className = $this->getClassName();
-        $interfaceEntity = new InterfaceEntity;
-        $interfaceEntity->name = $this->getInterfaceFullName($className);
-        if($this->buildDto->isCrudRepository) {
-            $uses[] = new ClassUseEntity(['name' => 'PhpLab\Core\Domain\Interfaces\Repository\CrudRepositoryInterface']);
-            $interfaceEntity->extends = 'CrudRepositoryInterface';
-        }
-        ClassHelper::generate($interfaceEntity, $uses);
-        return $interfaceEntity;*/
     }
 
     protected function createClass()
@@ -73,7 +69,6 @@ class RepositoryScenario extends BaseScenario
         $className = $this->getClassName();
         $driverDirName = Inflector::camelize($driver);
         $repoClassName = $driverDirName . '\\' . $className;
-        //$fullClassName = $this->getFullClassName();
         $fileGenerator = new FileGenerator;
         $classGenerator = new ClassGenerator;
         $fileGenerator->setNamespace($this->domainNamespace . '\\' . $this->classDir() . '\\' . $driverDirName);
@@ -82,10 +77,17 @@ class RepositoryScenario extends BaseScenario
         if($parentClass) {
             $fileGenerator->setUse($parentClass);
             $classGenerator->setExtendedClass(basename($parentClass));
-        } else {
-            $fileGenerator->setUse(ForgeEntityTrait::class);
-            $classGenerator->addUse('ForgeEntityTrait');
         }
+
+        $methodGenerator = $this->generateTableNameMethod();
+        $classGenerator->addMethodFromGenerator($methodGenerator);
+
+        $entityFullClassName = $this->domainNamespace . LocationHelper::fullClassName($this->name, TypeEnum::ENTITY);
+        $entityPureClassName = basename(LocationHelper::fullClassName($this->name, TypeEnum::ENTITY));
+        $fileGenerator->setUse($entityFullClassName);
+
+        $methodGenerator = $this->generateGetEntityClassMethod($entityPureClassName);
+        $classGenerator->addMethodFromGenerator($methodGenerator);
 
         $classGenerator->setName($className);
         if ($this->isMakeInterface()) {
@@ -93,42 +95,29 @@ class RepositoryScenario extends BaseScenario
             $fileGenerator->setUse($this->getInterfaceFullName());
         }
 
-        $entityFullClassName = $this->domainNamespace . LocationHelper::fullClassName($this->name, TypeEnum::ENTITY);
-        //$fileGenerator->setUse($entityFullClassName);
-        $entityClassName = basename($entityFullClassName);
-        $classGenerator->addProperties([
-            [Inflector::variablize('tableName'), "{$this->buildDto->domainName}_{$this->buildDto->name}", PropertyGenerator::FLAG_PROTECTED],
-            [Inflector::variablize('entityClass'), $entityFullClassName, PropertyGenerator::FLAG_PROTECTED],
-        ]);
-
-
         $fileGenerator->setClass($classGenerator);
         ClassHelper::generateFile($fileGenerator->getNamespace() . '\\' . $className, $fileGenerator->generate());
 
+    }
 
-        /*$className = $this->getClassName();
-        $uses = [];
-        $classEntity = new ClassEntity;
-        $classEntity->name = $this->domainNamespace . '\\' . $this->classDir() . '\\' . $repoClassName;
-        if($this->isMakeInterface()) {
-            $useEntity = new ClassUseEntity;
-            $useEntity->name = $this->getInterfaceFullName();
-            $uses[] = $useEntity;
-            $classEntity->implements = $this->getInterfaceName();
-        }
-$uses[] = new ClassUseEntity(['name' => $entityFullClassName]);
+    private function generateGetEntityClassMethod(string $entityPureClassName): MethodGenerator {
+        $tableName = "{$this->buildDto->domainName}_{$this->buildDto->name}";
+        $methodBody = "return {$entityPureClassName}::class;";
+        $methodGenerator = new MethodGenerator;
+        $methodGenerator->setName('getEntityClass');
+        $methodGenerator->setBody($methodBody);
+        $methodGenerator->setReturnType('string');
+        return $methodGenerator;
+    }
 
-        $parentClass = $this->parentClass($driver);
-        $uses[] = new ClassUseEntity(['name' => $parentClass]);
-        $classEntity->extends = basename($parentClass);
-
-        $classEntity->code = "
-    protected \$tableName = '{$this->buildDto->domainName}_{$this->buildDto->name}';
-    protected \$entityClass = {$entityClassName}::class;
-";
-
-        ClassHelper::generate($classEntity, $uses);
-        return $classEntity;*/
+    private function generateTableNameMethod(): MethodGenerator {
+        $tableName = "{$this->buildDto->domainName}_{$this->buildDto->name}";
+        $methodBody = "return '{$tableName}';";
+        $methodGenerator = new MethodGenerator;
+        $methodGenerator->setName('tableName');
+        $methodGenerator->setBody($methodBody);
+        $methodGenerator->setReturnType('string');
+        return $methodGenerator;
     }
 
     private function parentClass($driver)
@@ -136,9 +125,9 @@ $uses[] = new ClassUseEntity(['name' => $entityFullClassName]);
         $className = '';
         if ('eloquent' == $driver) {
             if ($this->buildDto->isCrudRepository) {
-                $className = 'PhpLab\Eloquent\Db\Base\BaseEloquentCrudRepository';
+                $className = BaseEloquentCrudRepository::class;
             } else {
-                $className = 'PhpLab\Eloquent\Db\Base\BaseEloquentRepository';
+                $className = BaseEloquentRepository::class;
             }
         } else {
             //$className = 'PhpLab\Core\Domain\Base\BaseRepository';

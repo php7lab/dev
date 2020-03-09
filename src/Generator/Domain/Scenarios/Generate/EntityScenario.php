@@ -15,6 +15,7 @@ use Zend\Code\Generator\FileGenerator;
 use Zend\Code\Generator\InterfaceGenerator;
 use Zend\Code\Generator\MethodGenerator;
 use Zend\Code\Generator\PropertyGenerator;
+use Zend\Code\Generator\PropertyValueGenerator;
 
 class EntityScenario extends BaseScenario
 {
@@ -54,24 +55,60 @@ class EntityScenario extends BaseScenario
 
         $classGenerator->setImplementedInterfaces($implementedInterfaces);
 
-        $validateBody = 'return [];';
+        $validateBody = $this->generateValidationRulesBody($this->attributes);
         $classGenerator->addMethod('validationRules', [], [], $validateBody);
 
         if ($this->attributes) {
             foreach ($this->attributes as $attribute) {
                 $attributeName = Inflector::variablize($attribute);
-                $classGenerator->addProperties([
-                    [$attributeName, null, PropertyGenerator::FLAG_PRIVATE]
-                ]);
-                $setterBody = '$this->' . $attributeName . ' = $value;';
-                $classGenerator->addMethod('set' . Inflector::camelize($attributeName), ['value'], [], $setterBody);
-                $getterBody = 'return $this->' . $attributeName . ';';
-                $classGenerator->addMethod('get' . Inflector::camelize($attributeName), [], [], $getterBody);
+
+                $propertyGenerator = new PropertyGenerator($attributeName, null, PropertyGenerator::FLAG_PRIVATE);
+                $classGenerator->addPropertyFromGenerator($propertyGenerator);
+
+                $setterMethodGenerator = $this->generateSetter($attributeName);
+                $classGenerator->addMethodFromGenerator($setterMethodGenerator);
+
+                $getterMethodGenerator = $this->generateGetter($attributeName);
+                $classGenerator->addMethodFromGenerator($getterMethodGenerator);
             }
         }
         $fileGenerator->setNamespace($this->domainNamespace . '\\' . $this->classDir());
         $fileGenerator->setClass($classGenerator);
+        $fileGenerator->setSourceDirty(false);
         ClassHelper::generateFile($fileGenerator->getNamespace() . '\\' . $className, $fileGenerator->generate());
+    }
+
+    private function generateValidationRulesBody(array $attributes): string {
+        $validationRules = [];
+        if ($attributes) {
+            foreach ($attributes as $attribute) {
+                $attributeName = Inflector::variablize($attribute);
+                $validationRules[] =
+                    "    '$attributeName' => [
+        new Assert\NotBlank,
+    ],";
+            }
+        }
+        $validateBody = 'return [' . PHP_EOL . implode(PHP_EOL, $validationRules) . PHP_EOL . '];';
+        return $validateBody;
+    }
+
+    private function generateSetter(string $attributeName): MethodGenerator {
+        $methodBody = '$this->' . $attributeName . ' = $value;';
+        $methodName = 'set' . Inflector::camelize($attributeName);
+        $methodGenerator = new MethodGenerator($methodName, ['value']);
+        $methodGenerator->setBody($methodBody);
+        $methodGenerator->setReturnType('void');
+        return $methodGenerator;
+    }
+
+    private function generateGetter(string $attributeName): MethodGenerator {
+        $methodBody = 'return $this->' . $attributeName . ';';
+        $methodName = 'get' . Inflector::camelize($attributeName);
+        $methodGenerator = new MethodGenerator($methodName);
+        $methodGenerator->setBody($methodBody);
+        //$methodGenerator->setReturnType('void');
+        return $methodGenerator;
     }
 
 }

@@ -21,7 +21,7 @@ class DriverInputScenario extends BaseInputScenario
         ];
         //$drivers['c'] = 'custom';
         $question = new ChoiceQuestion(
-            'Please select your favorite color (defaults to red)',
+            'Please select repository drivers',
             $drivers
         );
         $question->setMultiselect(true);
