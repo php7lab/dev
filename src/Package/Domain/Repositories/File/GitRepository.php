@@ -4,7 +4,6 @@ namespace PhpLab\Dev\Package\Domain\Repositories\File;
 
 use Illuminate\Support\Collection;
 use PhpLab\Core\Domain\Helpers\EntityHelper;
-use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
 use PhpLab\Dev\Package\Domain\Entities\CommitEntity;
 use PhpLab\Dev\Package\Domain\Entities\GitEntity;
 use PhpLab\Dev\Package\Domain\Entities\PackageEntity;
@@ -14,8 +13,6 @@ use PhpLab\Dev\Package\Domain\Libs\GitShell;
 
 class GitRepository implements GitRepositoryInterface
 {
-
-    use ForgeEntityTrait;
 
     const VENDOR_DIR = __DIR__ . '/../../../../../../..';
 

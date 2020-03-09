@@ -3,9 +3,10 @@
 namespace PhpLab\Dev\Package\Domain\Interfaces\Repositories;
 
 use Illuminate\Support\Collection;
+use PhpLab\Core\Domain\Interfaces\GetEntityClassInterface;
 use PhpLab\Dev\Package\Domain\Entities\PackageEntity;
 
-interface GitRepositoryInterface
+interface GitRepositoryInterface extends GetEntityClassInterface
 {
 
     public function isHasChanges(PackageEntity $packageEntity): bool;

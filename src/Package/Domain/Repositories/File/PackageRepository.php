@@ -4,17 +4,14 @@ namespace PhpLab\Dev\Package\Domain\Repositories\File;
 
 use Illuminate\Support\Collection;
 use PhpLab\Core\Domain\Interfaces\Entity\EntityIdInterface;
-use PhpLab\Core\Domain\Traits\ForgeEntityTrait;
-use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Core\Domain\Libs\Query;
+use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Dev\Package\Domain\Entities\GroupEntity;
 use PhpLab\Dev\Package\Domain\Entities\PackageEntity;
 use PhpLab\Dev\Package\Domain\Interfaces\Repositories\PackageRepositoryInterface;
 
 class PackageRepository implements PackageRepositoryInterface
 {
-
-    use ForgeEntityTrait;
 
     const VENDOR_DIR = __DIR__ . '/../../../../../../..';
 
@@ -45,7 +42,7 @@ class PackageRepository implements PackageRepositoryInterface
                 $packageEntity->setName($name);
                 $packageEntity->setGroup($groupEntity);
                 $isPackage = is_dir($packageEntity->getDirectory()) && is_file($packageEntity->getDirectory() . '/composer.json');
-                if($isPackage) {
+                if ($isPackage) {
                     $collection->add($packageEntity);
                 }
             }
