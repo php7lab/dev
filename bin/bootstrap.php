@@ -64,3 +64,6 @@ $application->add($command);
 
 $command = new GitVersionCommand(null, $packageService, $gitService);
 $application->add($command);
+
+$command = new \PhpLab\Dev\Package\Commands\PackVendorCommand;
+$application->add($command);
