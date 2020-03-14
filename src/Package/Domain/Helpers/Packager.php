@@ -14,18 +14,6 @@ class Packager
 
     protected $default_excludes = [
         '/.',
-        //'/tests',
-        '/docs',
-        '/examples',
-        '/composer.json',
-        '/LICENSE',
-        '/phpunit.xml',
-        '/php7lab/dev',
-        '/php7lab/test',
-        '/zndoc/rest-api',
-        //'/symfony/web-server-bundle',
-        '/phpunit/',
-        'regex:#[\s\S]+\.(md|bat|dist)#iu',
     ];
 
     protected $excludes = [];
@@ -35,10 +23,8 @@ class Packager
     public function __construct($vendor, $excludes = [])
     {
         $this->vendor_dir = str_replace(DIRECTORY_SEPARATOR, '/', $vendor);
-
         $this->excludes = array_merge($this->default_excludes, $excludes);
     }
-
 
     public function export($outPath) {
         $outPath = rtrim(rtrim($outPath, DIRECTORY_SEPARATOR), '/');
@@ -47,13 +33,6 @@ class Packager
         $phar = new Phar($this->vendor_dir.'/vendor.phar',
             \FilesystemIterator::CURRENT_AS_FILEINFO,
             'vendor.phar');
-
-
-        /*$vendor_base_path = dirname($this->vendor_dir);
-        $vendor_base_path = $this->getRelativePath($outPath, $vendor_base_path);
-        $vendor_base_path = '/' . trim($vendor_base_path, '/');*/
-
-        //dd($this->vendor_dir);
 
         $phar->startBuffering();
         $vendor_list = new \ArrayIterator($this->getVendorFiles($this->vendor_dir, $this->excludes));
@@ -128,20 +107,15 @@ __HALT_COMPILER();
         $iterator = new \RecursiveIteratorIterator($directory);
         $files = [];
         foreach ($iterator as $info) {
-            /**
-             * @var $info \SplFileInfo
-             */
+            /** @var $info \SplFileInfo */
             if ($info->isDir()) {
                 continue;
             }
             $path = str_replace(DIRECTORY_SEPARATOR, '/', $info->getRealPath());
             $path = str_replace($vendor_dir, '', $path);
-
-
             if ($this->matchExclude($path, $exlcudes)) {
                 continue;
             }
-
             $files[] = $info;
         }
 
@@ -156,7 +130,6 @@ __HALT_COMPILER();
                     return true;
                 }
             }
-
             if (stripos($path, $rule) !== false) {
                 return true;
             }
