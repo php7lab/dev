@@ -14,7 +14,7 @@ class Packager
 
     protected $default_excludes = [
         '/.',
-        '/tests',
+        //'/tests',
         '/docs',
         '/examples',
         '/composer.json',
@@ -24,7 +24,7 @@ class Packager
         '/php7lab/test',
         '/zndoc/rest-api',
         //'/symfony/web-server-bundle',
-        //'/phpunit/',
+        '/phpunit/',
         'regex:#[\s\S]+\.(md|bat|dist)#iu',
     ];
 
