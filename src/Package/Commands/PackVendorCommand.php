@@ -24,19 +24,36 @@ class PackVendorCommand extends Command
 
     private function excludes()
     {
+        $config = null;
+        if($_ENV['PHAR_CONFIG_FILE'] && file_exists(FileHelper::path($_ENV['PHAR_CONFIG_FILE']))) {
+            $config = include FileHelper::path($_ENV['PHAR_CONFIG_FILE']);
+        }
+        if($config['excludes']) {
+            return $config['excludes'];
+        }
+
         return [
             'regex:#\/(|tests|test|docs|doc|examples|example|benchmarks|benchmark|\.git)\/#iu',
             '/composer.json',
             '/composer.lock',
             '/LICENSE',
+            '/CHANGELOG',
             '/AUTHORS',
             '/Makefile',
             '/Vagrantfile',
             '/phpbench.json',
-            '/amphp/http-client-cookies/res/',
             '/appveyor.yml',
             '/phpstan.',
             '/phpunit.xml',
+            //'/amphp/http-client-cookies/res/',
+            //'/zendframework/',
+            '/tivie/',
+            '/nesbot/',
+            '/kelunik/',
+            //'/league/',
+            //'/symfony/translation/',
+            //'/symfony/translation-contracts/',
+            //'/symfony/service-contracts/',
             '/php7lab/dev/',
             '/php7lab/test/',
             '/zndoc/rest-api/',
