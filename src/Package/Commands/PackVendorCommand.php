@@ -13,29 +13,37 @@ class PackVendorCommand extends Command
 
     protected static $defaultName = 'package:pack';
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<fg=white># Pack vendor to phar</>');
         $rootDir = FileHelper::rootPath();
         $packager = new Packager($rootDir . '/vendor', $this->excludes());
         $packager->export($rootDir);
+        return 0;
     }
 
     private function excludes()
     {
         return [
-            //'/tests',
-            'regex:#\/(docs|doc|examples|example)\/#iu',
+            'regex:#\/(|tests|test|docs|doc|examples|example|benchmarks|benchmark|\.git)\/#iu',
             '/composer.json',
+            '/composer.lock',
             '/LICENSE',
+            '/AUTHORS',
+            '/Makefile',
+            '/Vagrantfile',
+            '/phpbench.json',
+            '/amphp/http-client-cookies/res/',
+            '/appveyor.yml',
+            '/phpstan.',
             '/phpunit.xml',
-            '/php7lab/dev',
-            '/php7lab/test',
-            '/zndoc/rest-api',
+            '/php7lab/dev/',
+            '/php7lab/test/',
+            '/zndoc/rest-api/',
             //'/symfony/web-server-bundle',
             '/phpunit/',
             //'/codeception/',
-            'regex:#[\s\S]+\.(md|bat|dist)#iu',
+            'regex:#[\s\S]+\.(md|bat|dist|rar|zip|gz|phar|py|sh|bat|cmd|exe|h|c)#iu',
         ];
     }
 }
