@@ -27,13 +27,14 @@ class DomainCommand extends BaseGeneratorCommand
         $this->domainService = $domainService;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<fg=white># Domain generator</>');
         $buildDto = new BuildDto;
         $buildDto->typeArray = ['service', 'repository', 'entity', 'migration', 'domain'];
         $this->input($input, $output, $buildDto);
         $this->domainService->generate($buildDto);
+        return 0;
     }
 
     private function input(InputInterface $input, OutputInterface $output, BuildDto $buildDto)
