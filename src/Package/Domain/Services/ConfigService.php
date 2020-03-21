@@ -39,7 +39,26 @@ class ConfigService extends BaseCrudService implements ConfigServiceInterface
             //EntityHelper::setAttributes($confiEntity, ComposerConfigMapper::arrayToEntity($composerConfig));
             $configCollection->add($confiEntity);
         }
+        return $configCollection;
+    }
 
+    public function allWithThirdParty(Query $query = null)
+    {
+        /** @var Collection | PackageEntity[] $packageCollection */
+        $packageCollection = $this->packageRepository->allWithThirdParty();
+        //dd($packageCollection);
+        $configCollection = new Collection;
+        foreach ($packageCollection as $packageEntity) {
+            $composerConfigFile = $packageEntity->getDirectory() . '/composer.json';
+            $composerConfigStore = new StoreFile($composerConfigFile);
+            $composerConfig = $composerConfigStore->load();
+            $confiEntity = new ConfigEntity;
+            $confiEntity->setId($packageEntity->getId());
+            $confiEntity->setConfig($composerConfig);
+            $confiEntity->setPackage($packageEntity);
+            //EntityHelper::setAttributes($confiEntity, ComposerConfigMapper::arrayToEntity($composerConfig));
+            $configCollection->add($confiEntity);
+        }
         return $configCollection;
     }
 

@@ -9,11 +9,13 @@ use PhpLab\Dev\Package\Domain\Entities\ConfigEntity;
 use PhpLab\Dev\Package\Domain\Helpers\ComposerConfigHelper;
 use PhpLab\Dev\Package\Domain\Interfaces\Services\ConfigServiceInterface;
 use PhpLab\Dev\Package\Domain\Interfaces\Services\GitServiceInterface;
+use PhpLab\Dev\Package\Domain\Libs\Depend;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use yii\helpers\ArrayHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class ComposerConfigCommand extends Command
 {
@@ -36,86 +38,54 @@ class ComposerConfigCommand extends Command
         $output->writeln('');
         /** @var ConfigEntity[] | Collection $collection */
         $collection = $this->configService->all();
+        /** @var ConfigEntity[] | Collection $collection */
+        $thirdPartyCollection = $this->configService->allWithThirdParty();
 
-        //$namespaces = ComposerConfigHelper::extractPsr4Autoload($collection);
-        $namespacesPackages = ComposerConfigHelper::extractPsr4AutoloadPackages($collection);
+        //dd($thirdPartyCollection);
+
+        $namespacesPackages = ComposerConfigHelper::extractPsr4AutoloadPackages($thirdPartyCollection);
+        //dd($namespacesPackages);
 
         $output->writeln('<fg=white>Get packages version...</>');
         $output->writeln('');
         $lastVersions = $this->gitService->lastVersionCollection();
+
+        $depend = new Depend($namespacesPackages, $lastVersions);
+        //$deps = $depend->all();
 
         if ($collection->count() == 0) {
             $output->writeln('<fg=magenta>Not found packages!</>');
             $output->writeln('');
             return 0;
         }
-        $deps = [];
-        $depsPhp = [];
+
+        $output->writeln('<fg=white>Get packages info...</>');
+        $output->writeln('');
+
+        $progressBar = new ProgressBar($output);
+        $progressBar->setMaxSteps($collection->count() + 1);
+        $progressBar->start();
+
+        /*$deps = [];
         foreach ($collection as $configEntity) {
-            $output->writeln('<fg=magenta># ' . $configEntity->getId() . '</>');
-            $output->writeln('');
+            $progressBar->advance();
             $dep = $this->item($configEntity, $namespacesPackages, $lastVersions);
+            $deps[$configEntity->getId()] = $dep;
+        }*/
+        $deps = $depend->all($collection, function() use($progressBar) {
+            $progressBar->advance();
+        });
+        $progressBar->finish();
+
+        $output->writeln('');
+        $output->writeln('');
+
+        foreach ($deps as $depId => $dep) {
+            $output->writeln('<fg=magenta># ' . $depId . '</>');
+            $output->writeln('');
             $output->writeln(Yaml::dump($dep, 10));
-            $deps[] = $dep;
         }
         return 0;
-    }
-
-    private function getRequiredFromCoPhpCode(ConfigEntity $configEntity, array $namespacesPackages): array {
-        $dir = $configEntity->getPackage()->getDirectory();
-        $uses = ComposerConfigHelper::getUses($dir);
-        $requirePackage = [];
-        if($uses) {
-            foreach ($uses as $use) {
-                foreach ($namespacesPackages as $namespacesPackage => $packageEntity) {
-                    if (mb_strpos($use, $namespacesPackage) === 0) {
-                        $requirePackage[] = $packageEntity->getId();
-                    }
-                }
-            }
-            $requirePackage = array_unique($requirePackage);
-            $requirePackage = array_values($requirePackage);
-        }
-        return $requirePackage;
-    }
-
-    private function getWanted() {
-
-    }
-
-    private function getRequreUpdate(array $lastVersions, array $requires) {
-        $requireUpdate = [];
-        foreach ($lastVersions as $packageId => $lastVersion) {
-            $currentVersion = ArrayHelper::getValue($requires, $packageId);
-            if($currentVersion && $lastVersion && version_compare($currentVersion, $lastVersion, '<')) {
-                $requireUpdate[$packageId] = $lastVersion;
-            }
-        }
-    }
-
-    private function item(ConfigEntity $configEntity, array $namespacesPackages, array $lastVersions) {
-        //$dep['id'] = $configEntity->getId();
-        $dep['require'] = $configEntity->getRequire();
-        $dep['require-dev'] = $configEntity->getRequireDev();
-
-        $requirePackage = $this->getRequiredFromCoPhpCode($configEntity, $namespacesPackages);
-
-        if(!empty($requirePackage)) {
-            //$dep['require-package'] = $requirePackage;
-            $wanted = ComposerConfigHelper::getWanted($configEntity, $requirePackage);
-            $dep['require-wanted'] = [];
-            foreach ($wanted as $packageId) {
-                $lastVersion = ArrayHelper::getValue($lastVersions, $packageId);
-                $dep['require-wanted'][$packageId] = $lastVersion;
-            }
-            $requires = $configEntity->getAllRequire();
-            if($requires) {
-                $dep['require-update'] = $this->getRequreUpdate($lastVersions, $requires);
-            }
-        }
-
-        //unset($dep['require-package']);
-        return $dep;
     }
 
 }
