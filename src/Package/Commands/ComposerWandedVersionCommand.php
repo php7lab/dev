@@ -34,7 +34,7 @@ class ComposerWandedVersionCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('<fg=white># Composer dependency version</>');
+        $output->writeln('<fg=white># Composer wanted version</>');
         $output->writeln('');
         /** @var ConfigEntity[] | Collection $collection */
         $collection = $this->configService->all();

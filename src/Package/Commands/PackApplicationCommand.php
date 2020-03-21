@@ -8,17 +8,18 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PackVendorCommand extends Command
+class PackApplicationCommand extends Command
 {
 
-    protected static $defaultName = 'package:pack:vendor';
+    protected static $defaultName = 'package:pack:app';
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<fg=white># Pack vendor to phar</>');
         $rootDir = FileHelper::rootPath();
-        $packager = new Packager($rootDir . '/vendor', $this->excludes());
-        $packager->exportVendor($rootDir);
+        $appDir = $rootDir . '/src';
+        $packager = new Packager($appDir, $this->excludes());
+        $packager->exportApp($appDir);
         return 0;
     }
 

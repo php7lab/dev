@@ -63,7 +63,7 @@ class Depend
             if(!empty($wanted)) {
                 $deps[$configEntity->getId()] = $wanted;
             }
-            if($callback) {
+            if($callback != null) {
                 $callback();
             }
         }
@@ -78,9 +78,9 @@ class Depend
             $dep = $this->item($configEntity);
             $dep['wanted'] = ArrayHelper::getValue($allWanted, $configEntity->getId());
             $deps[$configEntity->getId()] = $dep;
-            //if($callback) {
+            if($callback != null) {
                 $callback();
-            //}
+            }
         }
         return $deps;
     }

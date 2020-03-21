@@ -5,7 +5,7 @@ namespace PhpLab\Dev\Package\Domain\Helpers;
 class VendorHelper
 {
 
-    const VENDOR_DOWNLOAD_URL = 'https://tlg-assistant.000webhostapp.com/telegram-client/vendor.phar.gz';
+    /*const VENDOR_DOWNLOAD_URL = 'https://tlg-assistant.000webhostapp.com/telegram-client/vendor.phar.gz';
     public static function makeVendorDir() {
         echo PHP_EOL . PHP_EOL . 'make vendor dir...' . PHP_EOL . PHP_EOL;
         if( ! is_dir(__DIR__ . '/../../../vendor')) {
@@ -36,32 +36,12 @@ class VendorHelper
 
     public static function autoload($rootDir) {
         self::makeVendorDir();
-        /*$vendorPhar = __DIR__ . '/../../../vendor/vendor.phar.gz';
-        if( ! file_exists($vendorPhar)) {
-            if(is_file(__DIR__ . '/../../../vendor/autoload.php')) {
-                self::buildPhar($rootDir);
-                self::compressPhar();
-                self::removeVendorPhar();
-            } else {
-                self::downloadPhar($rootDir);
-                //self::unGzPhar();
-            }
-        }
-        echo PHP_EOL . PHP_EOL . 'Include phar...' . PHP_EOL . PHP_EOL;*/
 
         if (!file_exists('madeline.php')) {
             copy('https://phar.madelineproto.xyz/madeline.php', 'madeline.php');
         }
         require_once 'madeline.php';
 
-        //include(__DIR__ . '/../../../var/madeline.phar');
-        //include(realpath(__DIR__ . '/../../../vendor') . '/autoload.php');
-        //include('phar://' . realpath($vendorPhar) . '/autoload.php');
-        /*if(file_exists(__DIR__ . '/../../../vendor/vendor.phar.gz')) {
-            include('phar://' . realpath($vendorPhar) . '/autoload.php');
-        } else {
-            include(realpath(__DIR__ . '/../../../vendor') . '/autoload.php');
-        }*/
     }
 
     public static function rootDir(): string {
@@ -106,5 +86,5 @@ class VendorHelper
             return true;
         }
         return false;
-    }
+    }*/
 }

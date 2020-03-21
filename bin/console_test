@@ -2,14 +2,13 @@
 <?php
 
 use Symfony\Component\Console\Application;
+use PhpLab\Core\Libs\Env\DotEnvHelper;
+use Illuminate\Container\Container;
 
-require __DIR__ . '/../../../autoload.php';
 $_ENV['APP_ENV'] = $_SERVER['APP_ENV'] = 'test';
-\PhpLab\Core\Libs\Env\DotEnvHelper::init();
-
-// создаем консольное приложение
+require __DIR__ . '/../../../autoload.php';
+DotEnvHelper::init();
 $application = new Application;
-
+$container = Container::getInstance();
 require __DIR__ . '/bootstrap.php';
-
 $application->run();

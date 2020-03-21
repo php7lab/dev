@@ -3,6 +3,7 @@
 namespace PhpLab\Dev\Package\Domain\Helpers;
 
 use Phar;
+use PhpLab\Core\Helpers\ComposerHelper;
 
 class Packager
 {
@@ -26,33 +27,46 @@ class Packager
         $this->excludes = array_merge($this->default_excludes, $excludes);
     }
 
-    public function export($outPath) {
+    private function createPhar(string $sourcePath, string $outPath, array $excludes = [], string $stubCode = null): Phar {
         $outPath = rtrim(rtrim($outPath, DIRECTORY_SEPARATOR), '/');
         $outPath = str_replace(DIRECTORY_SEPARATOR, '/', $outPath);
-
-        $phar = new Phar($this->vendor_dir.'/vendor.phar',
-            \FilesystemIterator::CURRENT_AS_FILEINFO,
-            'vendor.phar');
-
+        $phar = new Phar($outPath.'/app.phar', \FilesystemIterator::CURRENT_AS_FILEINFO, 'app.phar');
         $phar->startBuffering();
-        $vendor_list = new \ArrayIterator($this->getVendorFiles($this->vendor_dir, $this->excludes));
-        $phar->buildFromIterator($vendor_list, $this->vendor_dir);
-
-        //$phar->buildFromDirectory($this->vendor_dir);
-
+        $vendor_list = new \ArrayIterator($this->getVendorFiles($sourcePath, $excludes));
+        $phar->buildFromIterator($vendor_list, $sourcePath);
         $this->fixBaseDir($phar);
-        $phar->setStub("
+        if($stubCode) {
+            $phar->setStub($stubCode);
+        }
+        $phar->stopBuffering();
+        //$phar->buildFromDirectory($sourcePath);
+        return $phar;
+    }
+
+    public function exportApp($outPath) {
+        ComposerHelper::register('App', __DIR__ . '/../src');
+        $stubCode = "
+<?php
+\Phar::interceptFileFuncs();
+\Phar::mount(\Phar::running(true) . '/.mount/', __DIR__.'/');
+
+__HALT_COMPILER();
+        ";
+        $phar = $this->createPhar($outPath, $outPath, $this->excludes, $stubCode);
+    }
+
+    public function exportVendor($outPath) {
+        $stubCode = "
 <?php
 \Phar::interceptFileFuncs();
 \Phar::mount(\Phar::running(true) . '/.mount/', __DIR__.'/');
 return require_once 'phar://' . __FILE__ . DIRECTORY_SEPARATOR . 'autoload.php';
 __HALT_COMPILER();
-        ");
-
-        $phar->stopBuffering();
+        ";
+        $phar = $this->createPhar($outPath, $outPath, $this->excludes, $stubCode);
     }
 
-    public function updateBaseDir(Phar $phar, string $file) {
+    private function updateBaseDir(Phar $phar, string $file) {
         $content = \file_get_contents($phar[$file]->getPathname());
         if (false !== $content) {
             $phar[$file] = \preg_replace(
@@ -63,7 +77,7 @@ __HALT_COMPILER();
         }
     }
 
-    public function fixBaseDir(\Phar $phar) {
+    private function fixBaseDir(\Phar $phar) {
         if (isset($phar['composer/autoload_classmap.php'])) {
             $this->updateBaseDir($phar, 'composer/autoload_classmap.php');
         }
@@ -102,7 +116,7 @@ __HALT_COMPILER();
         }
     }
 
-    public function getVendorFiles($vendor_dir, $exlcudes = []) {
+    private function getVendorFiles($vendor_dir, $exlcudes = []) {
         $directory = new \RecursiveDirectoryIterator($vendor_dir);
         $iterator = new \RecursiveIteratorIterator($directory);
         $files = [];
@@ -122,7 +136,7 @@ __HALT_COMPILER();
         return $files;
     }
 
-    public function matchExclude($path, $exlcudes = []) {
+    private function matchExclude($path, $exlcudes = []) {
         foreach ($exlcudes as $rule) {
             if (stripos($rule, 'regex') !== false) {
                 $rule = str_replace('regex:', '', $rule);
@@ -138,7 +152,7 @@ __HALT_COMPILER();
         return false;
     }
 
-    public function getRelativePath($from, $to)
+    /*public function getRelativePath($from, $to)
     {
         // some compatibility fixes for Windows paths
         $from = is_dir($from) ? rtrim($from, '\/') . '/' : $from;
@@ -169,6 +183,6 @@ __HALT_COMPILER();
             }
         }
         return implode('/', $relPath);
-    }
+    }*/
 
 }
