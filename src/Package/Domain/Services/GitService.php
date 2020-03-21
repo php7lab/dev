@@ -2,6 +2,7 @@
 
 namespace PhpLab\Dev\Package\Domain\Services;
 
+use Illuminate\Support\Collection;
 use PhpLab\Core\Legacy\Yii\Helpers\ArrayHelper;
 use PhpLab\Core\Domain\Base\BaseService;
 use PhpLab\Dev\Package\Domain\Entities\CommitEntity;
@@ -9,14 +10,31 @@ use PhpLab\Dev\Package\Domain\Entities\PackageEntity;
 use PhpLab\Dev\Package\Domain\Entities\TagEntity;
 use PhpLab\Dev\Package\Domain\Interfaces\Repositories\GitRepositoryInterface;
 use PhpLab\Dev\Package\Domain\Interfaces\Services\GitServiceInterface;
+use PhpLab\Dev\Package\Domain\Interfaces\Services\PackageServiceInterface;
 use PhpLab\Dev\Package\Domain\Libs\GitShell;
 
 class GitService extends BaseService implements GitServiceInterface
 {
 
-    public function __construct(GitRepositoryInterface $repository)
+    private $packageService;
+
+    public function __construct(GitRepositoryInterface $repository, PackageServiceInterface $packageService)
     {
         $this->repository = $repository;
+        $this->packageService = $packageService;
+    }
+
+    public function lastVersionCollection(): array
+    {
+        $collection = $this->packageService->all();
+        /** @var PackageEntity[] | Collection $collection */
+        $versionArray = [];
+        foreach ($collection as $packageEntity) {
+            $packageId = $packageEntity->getId();
+            $lastVersion = $this->lastVersion($packageEntity);
+            $versionArray[$packageId] = $lastVersion;
+        }
+        return $versionArray;
     }
 
     public function lastVersion(PackageEntity $packageEntity)

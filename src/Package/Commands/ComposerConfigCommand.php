@@ -2,11 +2,13 @@
 
 namespace PhpLab\Dev\Package\Commands;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Dev\Package\Domain\Entities\ConfigEntity;
 use PhpLab\Dev\Package\Domain\Helpers\ComposerConfigHelper;
 use PhpLab\Dev\Package\Domain\Interfaces\Services\ConfigServiceInterface;
+use PhpLab\Dev\Package\Domain\Interfaces\Services\GitServiceInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,11 +21,13 @@ class ComposerConfigCommand extends Command
     protected static $defaultName = 'package:composer:dependency-version';
 
     protected $configService;
+    protected $gitService;
 
-    public function __construct(?string $name = null, ConfigServiceInterface $configService)
+    public function __construct(?string $name = null, ConfigServiceInterface $configService, GitServiceInterface $gitService)
     {
         parent::__construct($name);
         $this->configService = $configService;
+        $this->gitService = $gitService;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -33,9 +37,14 @@ class ComposerConfigCommand extends Command
         /** @var ConfigEntity[] | Collection $collection */
         $collection = $this->configService->all();
 
-        $namespaces = ComposerConfigHelper::extractPsr4Autoload($collection);
+        //$namespaces = ComposerConfigHelper::extractPsr4Autoload($collection);
         $namespacesPackages = ComposerConfigHelper::extractPsr4AutoloadPackages($collection);
 
+        $output->writeln('<fg=white>Get packages version...</>');
+        $output->writeln('');
+        $lastVersions = $this->gitService->lastVersionCollection();
+
+        //dd($lastVersionCollection);
         //dd($namespacesPackages);
         //dd($namespaces);
 
@@ -47,23 +56,16 @@ class ComposerConfigCommand extends Command
         $deps = [];
         $depsPhp = [];
         foreach ($collection as $configEntity) {
-            $dep = $this->item($configEntity, $namespacesPackages);
-            //dd($dep);
-
+            $dep = $this->item($configEntity, $namespacesPackages, $lastVersions);
             $output->writeln('<fg=magenta># ' . $configEntity->getId() . '</>');
             $output->writeln('');
             $output->writeln(Yaml::dump($dep, 10));
             $deps[] = $dep;
-
         }
-        //dd($namespaces);
-
-        //dd($deps);
-        //$output->writeln(Yaml::dump($deps, 10));
         return 0;
     }
 
-    private function item(ConfigEntity $configEntity, array $namespacesPackages) {
+    private function item(ConfigEntity $configEntity, array $namespacesPackages, array $lastVersions) {
         //$dep['id'] = $configEntity->getId();
         $dep['require'] = $configEntity->getRequire();
         $dep['require-dev'] = $configEntity->getRequireDev();
@@ -72,7 +74,6 @@ class ComposerConfigCommand extends Command
 
         //$depsPhp[$configEntity->getId()] = ComposerConfigHelper::getUses($configEntity);
         $uses = ComposerConfigHelper::getUses($configEntity);
-
 
         $requirePackage = [];
         if($uses) {
@@ -89,7 +90,11 @@ class ComposerConfigCommand extends Command
         }
 
         if(!empty($requirePackage)) {
-            $dep['require-wanted'] = ComposerConfigHelper::getWanted($dep);
+            $wanted = ComposerConfigHelper::getWanted($dep);
+            $dep['require-wanted'] = [];
+            foreach ($wanted as $itemName) {
+                $dep['require-wanted'][$itemName] = ArrayHelper::getValue($lastVersions, $itemName, 'dev-master');
+            }
         }
 
         unset($dep['require-package']);
