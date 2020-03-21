@@ -3,7 +3,7 @@
 namespace PhpLab\Dev\Generator\Commands;
 
 use PhpLab\Dev\Generator\Domain\Dto\BuildDto;
-use PhpLab\Dev\Generator\Domain\Interfaces\DomainServiceInterface;
+use PhpLab\Dev\Generator\Domain\Interfaces\Services\DomainServiceInterface;
 use PhpLab\Dev\Generator\Domain\Scenarios\Input\DomainNameInputScenario;
 use PhpLab\Dev\Generator\Domain\Scenarios\Input\DomainNamespaceInputScenario;
 use PhpLab\Dev\Generator\Domain\Scenarios\Input\DriverInputScenario;

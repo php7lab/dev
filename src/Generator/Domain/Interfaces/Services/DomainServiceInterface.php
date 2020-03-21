@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpLab\Dev\Generator\Domain\Interfaces;
+namespace PhpLab\Dev\Generator\Domain\Interfaces\Services;
 
 use PhpLab\Dev\Generator\Domain\Dto\BuildDto;
 

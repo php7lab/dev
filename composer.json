@@ -9,7 +9,7 @@
     }
   ],
   "minimum-stability": "dev",
-  "require": {
+  "require-dev": {
     "zendframework/zend-code": "^3.3.0"
   },
   "autoload": {

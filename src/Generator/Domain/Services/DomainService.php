@@ -5,7 +5,7 @@ namespace PhpLab\Dev\Generator\Domain\Services;
 use PhpLab\Core\Legacy\Yii\Helpers\Inflector;
 use PhpLab\Core\Helpers\ClassHelper;
 use PhpLab\Dev\Generator\Domain\Dto\BuildDto;
-use PhpLab\Dev\Generator\Domain\Interfaces\DomainServiceInterface;
+use PhpLab\Dev\Generator\Domain\Interfaces\Services\DomainServiceInterface;
 use PhpLab\Dev\Generator\Domain\Scenarios\Generate\BaseScenario;
 
 class DomainService implements DomainServiceInterface

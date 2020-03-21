@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use PhpLab\Core\Domain\Interfaces\Entity\EntityIdInterface;
 use PhpLab\Core\Domain\Libs\Query;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
+use PhpLab\Core\Libs\Store\StoreFile;
 use PhpLab\Dev\Package\Domain\Entities\GroupEntity;
 use PhpLab\Dev\Package\Domain\Entities\PackageEntity;
 use PhpLab\Dev\Package\Domain\Interfaces\Repositories\PackageRepositoryInterface;
@@ -41,7 +42,8 @@ class PackageRepository implements PackageRepositoryInterface
                 $packageEntity = new PackageEntity;
                 $packageEntity->setName($name);
                 $packageEntity->setGroup($groupEntity);
-                $isPackage = is_dir($packageEntity->getDirectory()) && is_file($packageEntity->getDirectory() . '/composer.json');
+                $composerConfigFile = $packageEntity->getDirectory() . '/composer.json';
+                $isPackage = is_dir($packageEntity->getDirectory()) && is_file($composerConfigFile);
                 if ($isPackage) {
                     $collection->add($packageEntity);
                 }
