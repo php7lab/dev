@@ -37,13 +37,50 @@ class Depend
         }
     }
 
-    public function all($collection, callable $callback): array
+    private function getWanted($configEntity) {
+        $wantedResult = [];
+        $requirePackage = $this->getRequiredFromPhpCode($configEntity);
+        if(!empty($requirePackage)) {
+            $deps[$configEntity->getId()] = $wantedResult;
+        }
+        $wanted = ComposerConfigHelper::getWanted($configEntity, $requirePackage);
+        foreach ($wanted as $packageId) {
+            $lastVersion = ArrayHelper::getValue($this->lastVersions, $packageId);
+            if(empty($lastVersion)) {
+                $lastVersion = ArrayHelper::getValue($this->installedVersions, $packageId);
+            }
+            $lastVersion = str_replace('.x-dev', '.*', $lastVersion);
+            $wantedResult[$packageId] = $lastVersion;
+        }
+        return $wantedResult;
+    }
+
+    public function allDepends($collection, callable $callback = null): array
     {
         $deps = [];
         foreach ($collection as $configEntity) {
-            $callback();
+            $wanted = $this->getWanted($configEntity);
+            if(!empty($wanted)) {
+                $deps[$configEntity->getId()] = $wanted;
+            }
+            if($callback) {
+                $callback();
+            }
+        }
+        return $deps;
+    }
+
+    public function all($collection, callable $callback): array
+    {
+        $deps = [];
+        $allWanted = $this->allDepends($collection);
+        foreach ($collection as $configEntity) {
             $dep = $this->item($configEntity);
+            $dep['wanted'] = ArrayHelper::getValue($allWanted, $configEntity->getId());
             $deps[$configEntity->getId()] = $dep;
+            //if($callback) {
+                $callback();
+            //}
         }
         return $deps;
     }
@@ -66,10 +103,6 @@ class Depend
         return $requirePackage;
     }
 
-    private function getWanted() {
-
-    }
-
     private function getRequreUpdate(array $requires) {
         $requireUpdate = [];
         foreach ($this->lastVersions as $packageId => $lastVersion) {
@@ -84,24 +117,9 @@ class Depend
         //$dep['id'] = $configEntity->getId();
         $dep['all'] = $configEntity->getAllRequire();
 
-        $requirePackage = $this->getRequiredFromPhpCode($configEntity);
-
-        if(!empty($requirePackage)) {
-            //$dep['require-package'] = $requirePackage;
-            $wanted = ComposerConfigHelper::getWanted($configEntity, $requirePackage);
-            $dep['wanted'] = [];
-            foreach ($wanted as $packageId) {
-                $lastVersion = ArrayHelper::getValue($this->lastVersions, $packageId);
-                if(empty($lastVersion)) {
-                    $lastVersion = ArrayHelper::getValue($this->installedVersions, $packageId);
-                }
-                $lastVersion = str_replace('.x-dev', '.*', $lastVersion);
-                $dep['wanted'][$packageId] = $lastVersion;
-            }
-            $requires = $configEntity->getAllRequire();
-            if($requires) {
-                $dep['update'] = $this->getRequreUpdate($requires);
-            }
+        $requires = $configEntity->getAllRequire();
+        if($requires) {
+            $dep['update'] = $this->getRequreUpdate($requires);
         }
 
         //unset($dep['require-package']);

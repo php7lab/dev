@@ -40,18 +40,11 @@ class ComposerConfigCommand extends Command
         $collection = $this->configService->all();
         /** @var ConfigEntity[] | Collection $collection */
         $thirdPartyCollection = $this->configService->allWithThirdParty();
-
-        //dd($thirdPartyCollection);
-
         $namespacesPackages = ComposerConfigHelper::extractPsr4AutoloadPackages($thirdPartyCollection);
-        //dd($namespacesPackages);
 
         $output->writeln('<fg=white>Get packages version...</>');
         $output->writeln('');
         $lastVersions = $this->gitService->lastVersionCollection();
-
-        $depend = new Depend($namespacesPackages, $lastVersions);
-        //$deps = $depend->all();
 
         if ($collection->count() == 0) {
             $output->writeln('<fg=magenta>Not found packages!</>');
@@ -63,15 +56,9 @@ class ComposerConfigCommand extends Command
         $output->writeln('');
 
         $progressBar = new ProgressBar($output);
-        $progressBar->setMaxSteps($collection->count() + 1);
+        $progressBar->setMaxSteps($collection->count());
         $progressBar->start();
-
-        /*$deps = [];
-        foreach ($collection as $configEntity) {
-            $progressBar->advance();
-            $dep = $this->item($configEntity, $namespacesPackages, $lastVersions);
-            $deps[$configEntity->getId()] = $dep;
-        }*/
+        $depend = new Depend($namespacesPackages, $lastVersions);
         $deps = $depend->all($collection, function() use($progressBar) {
             $progressBar->advance();
         });
