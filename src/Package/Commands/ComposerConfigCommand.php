@@ -44,10 +44,6 @@ class ComposerConfigCommand extends Command
         $output->writeln('');
         $lastVersions = $this->gitService->lastVersionCollection();
 
-        //dd($lastVersionCollection);
-        //dd($namespacesPackages);
-        //dd($namespaces);
-
         if ($collection->count() == 0) {
             $output->writeln('<fg=magenta>Not found packages!</>');
             $output->writeln('');
@@ -56,7 +52,6 @@ class ComposerConfigCommand extends Command
         $deps = [];
         $depsPhp = [];
         foreach ($collection as $configEntity) {
-
             $output->writeln('<fg=magenta># ' . $configEntity->getId() . '</>');
             $output->writeln('');
             $dep = $this->item($configEntity, $namespacesPackages, $lastVersions);
@@ -66,17 +61,9 @@ class ComposerConfigCommand extends Command
         return 0;
     }
 
-    private function item(ConfigEntity $configEntity, array $namespacesPackages, array $lastVersions) {
-        //$dep['id'] = $configEntity->getId();
-        $dep['require'] = $configEntity->getRequire();
-        $dep['require-dev'] = $configEntity->getRequireDev();
-
-        //dd($configEntity);
-        //dd($psr4autoload);
-
-        //$depsPhp[$configEntity->getId()] = ComposerConfigHelper::getUses($configEntity);
-        $uses = ComposerConfigHelper::getUses($configEntity);
-
+    private function getRequiredFromCoPhpCode(ConfigEntity $configEntity, array $namespacesPackages): array {
+        $dir = $configEntity->getPackage()->getDirectory();
+        $uses = ComposerConfigHelper::getUses($dir);
         $requirePackage = [];
         if($uses) {
             foreach ($uses as $use) {
@@ -88,31 +75,46 @@ class ComposerConfigCommand extends Command
             }
             $requirePackage = array_unique($requirePackage);
             $requirePackage = array_values($requirePackage);
-            $dep['require-package'] = $requirePackage;
         }
+        return $requirePackage;
+    }
+
+    private function getWanted() {
+
+    }
+
+    private function getRequreUpdate(array $lastVersions, array $requires) {
+        $requireUpdate = [];
+        foreach ($lastVersions as $packageId => $lastVersion) {
+            $currentVersion = ArrayHelper::getValue($requires, $packageId);
+            if($currentVersion && $lastVersion && version_compare($currentVersion, $lastVersion, '<')) {
+                $requireUpdate[$packageId] = $lastVersion;
+            }
+        }
+    }
+
+    private function item(ConfigEntity $configEntity, array $namespacesPackages, array $lastVersions) {
+        //$dep['id'] = $configEntity->getId();
+        $dep['require'] = $configEntity->getRequire();
+        $dep['require-dev'] = $configEntity->getRequireDev();
+
+        $requirePackage = $this->getRequiredFromCoPhpCode($configEntity, $namespacesPackages);
 
         if(!empty($requirePackage)) {
-            $wanted = ComposerConfigHelper::getWanted($dep);
+            //$dep['require-package'] = $requirePackage;
+            $wanted = ComposerConfigHelper::getWanted($configEntity, $requirePackage);
             $dep['require-wanted'] = [];
             foreach ($wanted as $packageId) {
-                $dep['require-wanted'][$packageId] = ArrayHelper::getValue($lastVersions, $packageId, 'dev-master');
+                $lastVersion = ArrayHelper::getValue($lastVersions, $packageId);
+                $dep['require-wanted'][$packageId] = $lastVersion;
             }
-            $requires = array_merge($configEntity->getRequire(), $configEntity->getRequireDev());
+            $requires = $configEntity->getAllRequire();
             if($requires) {
-                //dd([$requires, $lastVersions]);
-                foreach ($lastVersions as $packageId => $lastVersion) {
-                    $currentVersion = ArrayHelper::getValue($requires, $packageId);
-                    //dd([$currentVersion, $lastVersion]);
-                    if($currentVersion && $lastVersion && version_compare($currentVersion, $lastVersion, '<')) {
-                        $dep['require-update'][$packageId] = $lastVersion;
-                    }
-                }
+                $dep['require-update'] = $this->getRequreUpdate($lastVersions, $requires);
             }
-
-
         }
 
-        unset($dep['require-package']);
+        //unset($dep['require-package']);
         return $dep;
     }
 

@@ -6,16 +6,18 @@ use Illuminate\Support\Collection;
 use PhpLab\Core\Legacy\Yii\Helpers\ArrayHelper;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Dev\Package\Domain\Entities\ConfigEntity;
+use PhpLab\Dev\Package\Domain\Entities\PackageEntity;
 
 class ComposerConfigHelper
 {
 
-    public static function getWanted(array $dep)
+    public static function getWanted(ConfigEntity $configEntity, $requirePackage)
     {
         $wanted = [];
-        if(!empty($dep['require-package'])) {
-            foreach ($dep['require-package'] as $packageId) {
-                $isDeclared = isset($dep['require'][$packageId]) || isset($dep['require-dev'][$packageId]);
+        if(!empty($requirePackage)) {
+            foreach ($requirePackage as $packageId) {
+                $allRequire = $configEntity->getAllRequire();
+                $isDeclared = isset($allRequire[$packageId]);
                 if( ! $isDeclared) {
                     $wanted[] = $packageId;
                 }
@@ -26,9 +28,8 @@ class ComposerConfigHelper
         return $wanted;
     }
 
-    public static function getUses(ConfigEntity $configEntity)
+    public static function getUses(string $dir)
     {
-        $dir = $configEntity->getPackage()->getDirectory();
         $options['only'][] = '*.php';
         $phpScripts = FileHelper::findFiles($dir, $options);
         $depss = [];
@@ -49,7 +50,7 @@ class ComposerConfigHelper
         /** @var ConfigEntity[] | Collection $collection */
         $namespaces = [];
         foreach ($collection as $configEntity) {
-            $psr4autoloads = self::extractPsr4($configEntity);
+            $psr4autoloads = $configEntity->getAllAutoloadPsr4();
             if($psr4autoloads) {
                 foreach ($psr4autoloads as $autoloadNamespace => $path) {
                     $autoloadNamespace = trim($autoloadNamespace, '\\');
@@ -69,7 +70,7 @@ class ComposerConfigHelper
         /** @var ConfigEntity[] | Collection $collection */
         $namespaces = [];
         foreach ($collection as $configEntity) {
-            $psr4autoloads = self::extractPsr4($configEntity);
+            $psr4autoloads = $configEntity->getAllAutoloadPsr4();
             if($psr4autoloads) {
                 foreach ($psr4autoloads as $autoloadNamespace => $path) {
                     $autoloadNamespace = trim($autoloadNamespace, '\\');
@@ -78,13 +79,6 @@ class ComposerConfigHelper
             }
         }
         return $namespaces;
-    }
-
-    public static function extractPsr4(ConfigEntity $configEntity)
-    {
-        $psr4autoloads = $configEntity->getAutoloadItem('psr-4');
-        $psr4devAutoloads = $configEntity->getAutoloadItem('psr-4');
-        return array_merge($psr4autoloads, $psr4devAutoloads);
     }
 
 }

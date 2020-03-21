@@ -32,7 +32,7 @@ class GitService extends BaseService implements GitServiceInterface
         foreach ($collection as $packageEntity) {
             $packageId = $packageEntity->getId();
             $lastVersion = $this->lastVersion($packageEntity);
-            $versionArray[$packageId] = $lastVersion;
+            $versionArray[$packageId] = $lastVersion ?? 'dev-master';
         }
         return $versionArray;
     }

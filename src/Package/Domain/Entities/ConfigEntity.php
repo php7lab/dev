@@ -163,6 +163,11 @@ class ConfigEntity implements ValidateEntityInterface, EntityIdInterface
         $this->setConfigItem('require', $value);
     }
 
+    public function getAllRequire()
+    {
+        return array_merge($this->getConfigItem('require', []), $this->getConfigItem('require-dev', []));
+    }
+
     public function getRequire()
     {
         return $this->getConfigItem('require', []);
@@ -181,6 +186,18 @@ class ConfigEntity implements ValidateEntityInterface, EntityIdInterface
     public function setAutoload($value) : void
     {
         $this->setConfigItem('autoload', $value);
+    }
+
+    public function getAllAutoload()
+    {
+        return array_merge($this->getConfigItem('autoload', []), $this->getConfigItem('autoload-dev', []));
+    }
+
+    public function getAllAutoloadPsr4()
+    {
+        $psr4autoloads = $this->getConfigItem('autoload.psr-4', []);
+        $psr4devAutoloads = $this->getConfigItem('autoload-dev.psr-4', []);
+        return array_merge($psr4autoloads, $psr4devAutoloads);
     }
 
     public function getAutoloadItem($name)
