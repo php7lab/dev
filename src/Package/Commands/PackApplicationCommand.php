@@ -26,7 +26,7 @@ class PackApplicationCommand extends Command
     private function excludes()
     {
         $config = null;
-        if($_ENV['PHAR_CONFIG_FILE'] && file_exists(FileHelper::path($_ENV['PHAR_CONFIG_FILE']))) {
+        if(isset($_ENV['PHAR_CONFIG_FILE']) && file_exists(FileHelper::path($_ENV['PHAR_CONFIG_FILE']))) {
             $config = include FileHelper::path($_ENV['PHAR_CONFIG_FILE']);
         }
         if($config['excludes']) {
