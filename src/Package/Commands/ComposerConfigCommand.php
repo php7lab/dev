@@ -56,9 +56,10 @@ class ComposerConfigCommand extends Command
         $deps = [];
         $depsPhp = [];
         foreach ($collection as $configEntity) {
-            $dep = $this->item($configEntity, $namespacesPackages, $lastVersions);
+
             $output->writeln('<fg=magenta># ' . $configEntity->getId() . '</>');
             $output->writeln('');
+            $dep = $this->item($configEntity, $namespacesPackages, $lastVersions);
             $output->writeln(Yaml::dump($dep, 10));
             $deps[] = $dep;
         }
@@ -70,6 +71,7 @@ class ComposerConfigCommand extends Command
         $dep['require'] = $configEntity->getRequire();
         $dep['require-dev'] = $configEntity->getRequireDev();
 
+        //dd($configEntity);
         //dd($psr4autoload);
 
         //$depsPhp[$configEntity->getId()] = ComposerConfigHelper::getUses($configEntity);
@@ -78,9 +80,9 @@ class ComposerConfigCommand extends Command
         $requirePackage = [];
         if($uses) {
             foreach ($uses as $use) {
-                foreach ($namespacesPackages as $namespacesPackage => $configEntity) {
+                foreach ($namespacesPackages as $namespacesPackage => $packageEntity) {
                     if (mb_strpos($use, $namespacesPackage) === 0) {
-                        $requirePackage[] = $configEntity->getId();
+                        $requirePackage[] = $packageEntity->getId();
                     }
                 }
             }
@@ -92,9 +94,22 @@ class ComposerConfigCommand extends Command
         if(!empty($requirePackage)) {
             $wanted = ComposerConfigHelper::getWanted($dep);
             $dep['require-wanted'] = [];
-            foreach ($wanted as $itemName) {
-                $dep['require-wanted'][$itemName] = ArrayHelper::getValue($lastVersions, $itemName, 'dev-master');
+            foreach ($wanted as $packageId) {
+                $dep['require-wanted'][$packageId] = ArrayHelper::getValue($lastVersions, $packageId, 'dev-master');
             }
+            $requires = array_merge($configEntity->getRequire(), $configEntity->getRequireDev());
+            if($requires) {
+                //dd([$requires, $lastVersions]);
+                foreach ($lastVersions as $packageId => $lastVersion) {
+                    $currentVersion = ArrayHelper::getValue($requires, $packageId);
+                    //dd([$currentVersion, $lastVersion]);
+                    if($currentVersion && $lastVersion && version_compare($currentVersion, $lastVersion, '<')) {
+                        $dep['require-update'][$packageId] = $lastVersion;
+                    }
+                }
+            }
+
+
         }
 
         unset($dep['require-package']);
