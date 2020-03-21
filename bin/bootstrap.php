@@ -74,5 +74,8 @@ $application->add($command);
 $command = $container->get(ComposerConfigCommand::class);
 $application->add($command);
 
+$command = $container->get(\PhpLab\Dev\Package\Commands\ComposerWandedVersionCommand::class);
+$application->add($command);
+
 $command = $container->get(\PhpLab\Dev\Package\Commands\PackVendorCommand::class);
 $application->add($command);
