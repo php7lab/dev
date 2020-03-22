@@ -1,25 +1,25 @@
 <?php
 
-namespace PhpLab\Dev\Package\Commands;
+namespace PhpLab\Dev\Phar\Commands;
 
 use PhpLab\Core\Console\Widgets\LogWidget;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
-use PhpLab\Dev\Package\Domain\Helpers\Packager;
 use PhpLab\Dev\Phar\Domain\Helpers\PharHelper;
+use PhpLab\Dev\Phar\Domain\Libs\Packager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PackApplicationCommand extends Command
+class PackVendorCommand extends Command
 {
 
-    protected static $defaultName = 'package:pack:app';
+    protected static $defaultName = 'phar:pack:vendor';
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('<fg=white># Pack application to phar</>');
+        $output->writeln('<fg=white># Pack vendor to phar</>');
         $logWidget = new LogWidget($output);
-        $config = PharHelper::loadConfig('app');
+        $config = PharHelper::loadConfig('vendor');
         $excludes = $config['excludes'] ?? $this->excludes();
         $logWidget->start('Pack files');
         $packager = new Packager;

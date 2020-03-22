@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpLab\Dev\Package\Domain\Helpers;
+namespace PhpLab\Dev\Phar\Domain\Libs;
 
 use Phar;
 use PhpLab\Core\Helpers\ComposerHelper;

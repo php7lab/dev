@@ -62,11 +62,13 @@ $application->add($command);
 $command = $container->get(\PhpLab\Dev\Package\Commands\ComposerWandedVersionCommand::class);
 $application->add($command);
 
-$command = $container->get(\PhpLab\Dev\Package\Commands\PackVendorCommand::class);
+// --- phar ---
+
+$command = $container->get(\PhpLab\Dev\Phar\Commands\PackVendorCommand::class);
 $application->add($command);
 
-$command = $container->get(\PhpLab\Dev\Package\Commands\PackApplicationCommand::class);
+$command = $container->get(\PhpLab\Dev\Phar\Commands\PackApplicationCommand::class);
 $application->add($command);
 
-$command = $container->get(\PhpLab\Dev\Package\Commands\UploadVendorCommand::class);
+$command = $container->get(\PhpLab\Dev\Phar\Commands\UploadVendorCommand::class);
 $application->add($command);

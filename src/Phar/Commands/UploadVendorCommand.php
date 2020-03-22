@@ -1,57 +1,47 @@
 <?php
 
-namespace PhpLab\Dev\Package\Commands;
+namespace PhpLab\Dev\Phar\Commands;
 
 use Illuminate\Container\Container;
 use PhpLab\Core\Console\Widgets\LogWidget;
+use PhpLab\Core\Console\Widgets\TextWidget;
 use PhpLab\Core\Legacy\Yii\Helpers\ArrayHelper;
-use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
-use PhpLab\Dev\Package\Domain\Helpers\Packager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
 class UploadVendorCommand extends Command
 {
 
-    protected static $defaultName = 'package:upload:vendor';
+    protected static $defaultName = 'phar:upload:vendor';
 
-    /*private function start(string $message, OutputInterface $output) {
-        $output->write("<fg=white>{$message}... </>");
-    }
-
-    private function finishSuccess(OutputInterface $output) {
-        $output->writeln("<fg=green>OK</>");
-    }
-
-    private function finishFail(string $message, OutputInterface $output) {
-        $output->writeln("<fg=red>{$message}</>");
-    }*/
-
-    private function ensurePhar(string $pharFile, InputInterface $input, OutputInterface $output) {
+    private function ensurePhar(string $pharFile, InputInterface $input, OutputInterface $output)
+    {
         $logWidget = new LogWidget($output);
         $pharGzFile = $pharFile . '.gz';
-        if( ! file_exists($pharGzFile)) {
-            if( ! file_exists($pharFile)) {
-                $packVendorCommand = Container::getInstance()->get(PackVendorCommand::class);
-                $packVendorCommand->execute($input, $output);
-            }
-            $logWidget->start('Compress');
-            $content = file_get_contents($pharFile);
-            file_put_contents($pharGzFile, gzencode($content));
-            $logWidget->finishSuccess();
-            /*if(file_exists($pharFile)) {
 
-            } else {
-                $logWidget->finishFail('vendor.phar.gz not exists!');
-                return 1;
-            }*/
+        if (file_exists($pharGzFile)) {
+            $question = new ConfirmationQuestion('Update phar? (y|n) [n]: ', false);
+            $helper = $this->getHelper('question');
+            $isUpdate = $helper->ask($input, $output, $question);
+            if ( ! $isUpdate) {
+                return;
+            }
         }
+        $packVendorCommand = Container::getInstance()->get(PackVendorCommand::class);
+        $packVendorCommand->execute($input, $output);
+        $logWidget->start('Compress');
+        $content = file_get_contents($pharFile);
+        file_put_contents($pharGzFile, gzencode($content));
+        $logWidget->finishSuccess();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        //$helper = new QuestionHelper;
+
         $output->writeln('<fg=white># Upload vendor to phar</>');
 
         $basePath = $_ENV['VENDOR_FTP_DIRECTORY'];
@@ -76,17 +66,14 @@ class UploadVendorCommand extends Command
 
         ArrayHelper::removeByValue('.', $versionList);
         ArrayHelper::removeByValue('..', $versionList);
-        $versionList = array_map(function($value) {
-            return trim($value, 'v');
-        }, $versionList);
         natsort($versionList);
         array_splice($versionList, 0, -3);
-        $output->writeln('<fg=white>'.implode(PHP_EOL, $versionList).'</>');
+        $textWidget = new TextWidget($output);
+        $textWidget->writelnList($versionList);
 
         $logWidget->start('Check last version');
         $lastSize = ftp_size($conn_id, $basePath . '/' . ArrayHelper::last($versionList) . '/vendor.phar.gz');
-        //exit("$lastSize == ".filesize($pharGzFile));
-        if($lastSize == filesize($pharGzFile)) {
+        if ($lastSize == filesize($pharGzFile)) {
             $logWidget->finishSuccess('Already published!');
             return 0;
         }
@@ -96,15 +83,22 @@ class UploadVendorCommand extends Command
         $question = new Question('Enter new version: ');
         $version = $helper->ask($input, $output, $question);
         $version = trim($version, 'v');
-        if( ! preg_match('#\d+\.\d+\.\d+#', $version)) {
+
+        if ( ! preg_match('#\d+\.\d+\.\d+#', $version)) {
             $output->writeln('<fg=red>bad version!</>');
             return 1;
         }
 
-        if(in_array($version, $versionList)) {
+        if (in_array($version, $versionList)) {
             $output->writeln('<fg=red>exists version!</>');
             return 1;
         }
+
+        if (version_compare($version, ArrayHelper::last($versionList), '<=')) {
+            $output->writeln('<fg=red>letter than last version!</>');
+            return 1;
+        }
+
         $remoteDirectory = $basePath . '/' . $version;
         $remoteFile = $remoteDirectory . '/' . basename($pharGzFile);
 
