@@ -2,6 +2,7 @@
 
 namespace PhpLab\Dev\Package\Commands;
 
+use PhpLab\Core\Console\Widgets\LogWidget;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Dev\Package\Domain\Helpers\Packager;
 use Symfony\Component\Console\Command\Command;
@@ -16,9 +17,15 @@ class PackVendorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<fg=white># Pack vendor to phar</>');
+
+        $logWidget = new LogWidget($output);
+
+        $logWidget->start('Pack files');
         $rootDir = FileHelper::rootPath();
-        $packager = new Packager($this->excludes());
-        $packager->exportVendor($rootDir . '/vendor');
+        $packager = new Packager;
+        $packager->exportVendor($rootDir . '/vendor', $this->excludes());
+        $logWidget->finishSuccess();
+
         return 0;
     }
 

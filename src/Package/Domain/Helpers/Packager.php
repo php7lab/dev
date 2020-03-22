@@ -5,49 +5,28 @@ namespace PhpLab\Dev\Package\Domain\Helpers;
 use Phar;
 use PhpLab\Core\Helpers\ComposerHelper;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
+use ArrayIterator;
 
 class Packager
 {
 
-    protected $default_excludes = [
-        '/.',
-    ];
-
-    protected $excludes = [];
-
-    /**
-     * Packager constructor.
-     */
-    public function __construct($excludes = [])
-    {
-        $this->excludes = array_merge($this->default_excludes, $excludes);
-    }
-
     private function getStubCode(): string
     {
-        return "
-<?php
-\Phar::interceptFileFuncs();
-\Phar::mount(\Phar::running(true) . '/.mount/', __DIR__.'/');
-__HALT_COMPILER();
-        ";
+        return file_get_contents(__DIR__ . '/stub.php');
     }
 
-    private function createPhar(string $sourcePath, string $outPath, array $excludes = [], string $stubCode = null): Phar
+    private function createPhar(string $sourcePath, string $outPath, ArrayIterator $arrayIterator = null, string $stubCode = null): Phar
     {
-        //exit($outPath);
         $outPath = rtrim(rtrim($outPath, DIRECTORY_SEPARATOR), '/');
         $outPath = str_replace(DIRECTORY_SEPARATOR, '/', $outPath);
-
-        //exit(basename($outPath));
 
         FileHelper::remove($outPath);
         FileHelper::remove($outPath . '.gz');
 
         $phar = new Phar($outPath, \FilesystemIterator::CURRENT_AS_FILEINFO, basename($outPath));
         $phar->startBuffering();
-        $fileList = new \ArrayIterator($this->getFiles($sourcePath, $excludes));
-        $phar->buildFromIterator($fileList, $sourcePath);
+        //$arrayIterator = $arrayIterator ?? new ArrayIterator($this->getFiles($sourcePath, []));
+        $phar->buildFromIterator($arrayIterator, $sourcePath);
         $this->fixBaseDir($phar);
         $stubCode = $stubCode ?? $this->getStubCode();
         $phar->setStub($stubCode);
@@ -56,15 +35,20 @@ __HALT_COMPILER();
         return $phar;
     }
 
-    public function exportApp($outPath)
+    public function exportApp($sourcePath, array $excludes = [])
     {
-        //ComposerHelper::register('App', __DIR__ . '/../src');
-        $phar = $this->createPhar($outPath, $outPath . '/app.phar', $this->excludes);
+        $outPath = $sourcePath . '/app.phar';
+        $fileList = $this->getFiles($sourcePath, $excludes);
+        $arrayIterator = new ArrayIterator($fileList);
+        $phar = $this->createPhar($sourcePath, $outPath, $arrayIterator);
     }
 
-    public function exportVendor($outPath)
+    public function exportVendor($sourcePath, array $excludes = [])
     {
-        $phar = $this->createPhar($outPath, $outPath . '/vendor.phar', $this->excludes);
+        $outPath = $sourcePath . '/vendor.phar';
+        $fileList = $this->getFiles($sourcePath, $excludes);
+        $arrayIterator = new ArrayIterator($fileList);
+        $phar = $this->createPhar($sourcePath, $outPath, $arrayIterator);
     }
 
     private function updateBaseDir(Phar $phar, string $file)
@@ -152,7 +136,6 @@ __HALT_COMPILER();
                 return true;
             }
         }
-
         return false;
     }
 

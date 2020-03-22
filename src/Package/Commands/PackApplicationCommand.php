@@ -16,10 +16,12 @@ class PackApplicationCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<fg=white># Pack application to phar</>');
+        $output->writeln('<fg=white>Pack files...</>');
         $rootDir = FileHelper::rootPath();
         $appDir = $rootDir . '/src';
-        $packager = new Packager($this->excludes());
-        $packager->exportApp($appDir);
+        $packager = new Packager;
+        $packager->exportApp($appDir, $this->excludes());
+        $output->writeln('<fg=green>Pack success!</>');
         return 0;
     }
 
