@@ -5,6 +5,7 @@ namespace PhpLab\Dev\Package\Commands;
 use PhpLab\Core\Console\Widgets\LogWidget;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Dev\Package\Domain\Helpers\Packager;
+use PhpLab\Dev\Phar\Domain\Helpers\PharHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,28 +18,18 @@ class PackVendorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<fg=white># Pack vendor to phar</>');
-
         $logWidget = new LogWidget($output);
-
+        $config = PharHelper::loadConfig('vendor');
+        $excludes = $config['excludes'] ?? $this->excludes();
         $logWidget->start('Pack files');
-        $rootDir = FileHelper::rootPath();
         $packager = new Packager;
-        $packager->exportVendor($rootDir . '/vendor', $this->excludes());
+        $packager->exportVendor($config['sourceDir'], $config['outputFile'], $excludes);
         $logWidget->finishSuccess();
-
         return 0;
     }
 
     private function excludes()
     {
-        $config = null;
-        if(isset($_ENV['PHAR_CONFIG_FILE']) && file_exists(FileHelper::path($_ENV['PHAR_CONFIG_FILE']))) {
-            $config = include FileHelper::path($_ENV['PHAR_CONFIG_FILE']);
-        }
-        if($config['excludes']) {
-            return $config['excludes'];
-        }
-
         return [
             'regex:#\/(|tests|test|docs|doc|examples|example|benchmarks|benchmark|\.git)\/#iu',
             '/composer.json',

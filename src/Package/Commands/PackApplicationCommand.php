@@ -2,8 +2,10 @@
 
 namespace PhpLab\Dev\Package\Commands;
 
+use PhpLab\Core\Console\Widgets\LogWidget;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Dev\Package\Domain\Helpers\Packager;
+use PhpLab\Dev\Phar\Domain\Helpers\PharHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,31 +18,23 @@ class PackApplicationCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<fg=white># Pack application to phar</>');
-        $output->writeln('<fg=white>Pack files...</>');
-        $rootDir = FileHelper::rootPath();
-        $appDir = $rootDir . '/src';
+        $logWidget = new LogWidget($output);
+        $config = PharHelper::loadConfig('app');
+        $excludes = $config['excludes'] ?? $this->excludes();
+        $logWidget->start('Pack files');
         $packager = new Packager;
-        $packager->exportApp($appDir, $this->excludes());
-        $output->writeln('<fg=green>Pack success!</>');
+        $packager->exportVendor($config['sourceDir'], $config['outputFile'], $excludes);
+        $logWidget->finishSuccess();
         return 0;
     }
 
     private function excludes()
     {
-        $config = null;
-        if(isset($_ENV['PHAR_CONFIG_FILE']) && file_exists(FileHelper::path($_ENV['PHAR_CONFIG_FILE']))) {
-            $config = include FileHelper::path($_ENV['PHAR_CONFIG_FILE']);
-        }
-        if($config['excludes']) {
-            return $config['excludes'];
-        }
-
         return [
             'regex:#\/(|tests|test|docs|doc|examples|example|benchmarks|benchmark|\.git)\/#iu',
             '/composer.json',
             '/composer.lock',
             '/LICENSE',
-            '/Autoload.php',
             '/CHANGELOG',
             '/AUTHORS',
             '/Makefile',

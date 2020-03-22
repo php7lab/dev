@@ -35,17 +35,17 @@ class Packager
         return $phar;
     }
 
-    public function exportApp($sourcePath, array $excludes = [])
+    public function exportApp($sourcePath, $outPath, array $excludes = [])
     {
-        $outPath = $sourcePath . '/app.phar';
+        //$outPath = $sourcePath . '/app.phar';
         $fileList = $this->getFiles($sourcePath, $excludes);
         $arrayIterator = new ArrayIterator($fileList);
         $phar = $this->createPhar($sourcePath, $outPath, $arrayIterator);
     }
 
-    public function exportVendor($sourcePath, array $excludes = [])
+    public function exportVendor($sourcePath, $outPath, array $excludes = [])
     {
-        $outPath = $sourcePath . '/vendor.phar';
+        //$outPath = $sourcePath . '/vendor.phar';
         $fileList = $this->getFiles($sourcePath, $excludes);
         $arrayIterator = new ArrayIterator($fileList);
         $phar = $this->createPhar($sourcePath, $outPath, $arrayIterator);
