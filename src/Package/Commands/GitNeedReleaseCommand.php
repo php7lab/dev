@@ -12,7 +12,7 @@ class GitNeedReleaseCommand extends BaseCommand
 
     protected static $defaultName = 'package:git:need-release';
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<fg=white># Packages need release</>');
         $collection = $this->packageService->all();
@@ -20,17 +20,18 @@ class GitNeedReleaseCommand extends BaseCommand
         if ($collection->count() == 0) {
             $output->writeln('<fg=magenta>Not found packages!</>');
             $output->writeln('');
-            return;
+            return 0;
         }
         $totalCollection = $this->displayProgress($collection, $input, $output);
         $output->writeln('');
         if ($totalCollection->count() == 0) {
             $output->writeln('<fg=magenta>All packages released!</>');
             $output->writeln('');
-            return;
+            return 0;
         }
         $this->displayTotal($totalCollection, $input, $output);
         $output->writeln('');
+        return 0;
     }
 
     private function displayProgress(Collection $collection, InputInterface $input, OutputInterface $output): Collection
