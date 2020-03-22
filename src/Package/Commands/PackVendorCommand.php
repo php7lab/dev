@@ -17,8 +17,8 @@ class PackVendorCommand extends Command
     {
         $output->writeln('<fg=white># Pack vendor to phar</>');
         $rootDir = FileHelper::rootPath();
-        $packager = new Packager($rootDir . '/vendor', $this->excludes());
-        $packager->exportVendor($rootDir);
+        $packager = new Packager($this->excludes());
+        $packager->exportVendor($rootDir . '/vendor');
         return 0;
     }
 

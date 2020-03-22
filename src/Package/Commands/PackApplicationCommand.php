@@ -15,10 +15,10 @@ class PackApplicationCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('<fg=white># Pack vendor to phar</>');
+        $output->writeln('<fg=white># Pack application to phar</>');
         $rootDir = FileHelper::rootPath();
         $appDir = $rootDir . '/src';
-        $packager = new Packager($appDir, $this->excludes());
+        $packager = new Packager($this->excludes());
         $packager->exportApp($appDir);
         return 0;
     }
@@ -38,6 +38,7 @@ class PackApplicationCommand extends Command
             '/composer.json',
             '/composer.lock',
             '/LICENSE',
+            '/Autoload.php',
             '/CHANGELOG',
             '/AUTHORS',
             '/Makefile',

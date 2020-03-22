@@ -67,3 +67,6 @@ $application->add($command);
 
 $command = $container->get(\PhpLab\Dev\Package\Commands\PackApplicationCommand::class);
 $application->add($command);
+
+$command = $container->get(\PhpLab\Dev\Package\Commands\UploadVendorCommand::class);
+$application->add($command);
