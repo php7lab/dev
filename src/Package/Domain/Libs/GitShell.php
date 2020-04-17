@@ -372,9 +372,23 @@ class GitShell extends BaseShell
     public function hasChanges()
     {
         $this->begin();
-        $lastLine = exec('git status');
+        $outputLines = null;
+        $lastLine = exec('git status', $outputLines);
         $this->end();
-        return (strpos($lastLine, 'nothing to commit')) === false; // FALSE => changes
+        return $this->searchText($outputLines, ['nothing to commit', 'нет изменений добавленных для коммита']);
+        //return (strpos($lastLine, 'nothing to commit')) === false; // FALSE => changes
+    }
+
+    private function searchText(array $lines, $needles) {
+        foreach ($lines as $line) {
+            foreach ($needles as $needle) {
+                $isHas = strpos($line, $needle) !== false;
+                if($isHas) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public function clone($remote = null, array $params = null)
