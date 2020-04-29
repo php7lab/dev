@@ -8,7 +8,8 @@ use Illuminate\Container\Container;
 $_ENV['APP_ENV'] = $_SERVER['APP_ENV'] = 'test';
 require __DIR__ . '/../../../autoload.php';
 DotEnvHelper::init();
-$application = new Application;
-$container = Container::getInstance();
 require __DIR__ . '/bootstrap.php';
+
+$container = Container::getInstance();
+$application = $container->get(Application::class);
 $application->run();

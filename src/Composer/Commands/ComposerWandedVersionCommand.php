@@ -1,13 +1,13 @@
 <?php
 
-namespace PhpLab\Dev\Package\Commands;
+namespace PhpLab\Dev\Composer\Commands;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Dev\Package\Domain\Entities\ConfigEntity;
 use PhpLab\Dev\Package\Domain\Helpers\ComposerConfigHelper;
-use PhpLab\Dev\Package\Domain\Interfaces\Services\ConfigServiceInterface;
+use PhpLab\Dev\Composer\Domain\Interfaces\Services\ConfigServiceInterface;
 use PhpLab\Dev\Package\Domain\Interfaces\Services\GitServiceInterface;
 use PhpLab\Dev\Package\Domain\Libs\Depend;
 use Symfony\Component\Console\Command\Command;
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 class ComposerWandedVersionCommand extends Command
 {
 
-    protected static $defaultName = 'package:composer:wanted-version';
+    protected static $defaultName = 'composer:config:wanted-version';
 
     protected $configService;
     protected $gitService;

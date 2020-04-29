@@ -12,7 +12,7 @@ class GitVersionCommand extends BaseCommand
 
     protected static $defaultName = 'package:git:version';
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<fg=white># Packages version</>');
         $collection = $this->packageService->all();
@@ -20,10 +20,11 @@ class GitVersionCommand extends BaseCommand
         if ($collection->count() == 0) {
             $output->writeln('<fg=magenta>Not found packages!</>');
             $output->writeln('');
-            return;
+            return 0;
         }
         $totalCollection = $this->displayProgress($collection, $input, $output);
         $output->writeln('');
+        return 0;
     }
 
     private function displayProgress(Collection $collection, InputInterface $input, OutputInterface $output): Collection

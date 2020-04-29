@@ -1,9 +1,9 @@
 <?php
 
-namespace PhpLab\Dev\Package\Domain\Repositories\File;
+namespace PhpLab\Dev\Composer\Domain\Repositories\File;
 
 use PhpLab\Dev\Package\Domain\Entities\ConfigEntity;
-use PhpLab\Dev\Package\Domain\Interfaces\Repositories\ConfigRepositoryInterface;
+use PhpLab\Dev\Composer\Domain\Interfaces\Repositories\ConfigRepositoryInterface;
 
 class ConfigRepository implements ConfigRepositoryInterface
 {
@@ -18,6 +18,4 @@ class ConfigRepository implements ConfigRepositoryInterface
         return ConfigEntity::class;
     }
 
-
 }
-

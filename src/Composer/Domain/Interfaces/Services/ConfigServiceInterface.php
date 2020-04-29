@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpLab\Dev\Package\Domain\Interfaces\Services;
+namespace PhpLab\Dev\Composer\Domain\Interfaces\Services;
 
 use PhpLab\Core\Domain\Interfaces\Service\CrudServiceInterface;
 

@@ -2,6 +2,7 @@
 
 namespace PhpLab\Dev\Package\Domain\Libs;
 
+use PhpLab\Core\Legacy\Yii\Helpers\ArrayHelper;
 use PhpLab\Core\Libs\Store\StoreFile;
 use yii2rails\domain\enums\RelationEnum;
 use Illuminate\Support\Arr;
@@ -9,13 +10,12 @@ use Illuminate\Support\Collection;
 use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
 use PhpLab\Dev\Package\Domain\Entities\ConfigEntity;
 use PhpLab\Dev\Package\Domain\Helpers\ComposerConfigHelper;
-use PhpLab\Dev\Package\Domain\Interfaces\Services\ConfigServiceInterface;
+use PhpLab\Dev\Composer\Domain\Interfaces\Services\ConfigServiceInterface;
 use PhpLab\Dev\Package\Domain\Interfaces\Services\GitServiceInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
-use yii\helpers\ArrayHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 class Depend
