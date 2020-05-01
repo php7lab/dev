@@ -2,7 +2,7 @@
 
 use Illuminate\Container\Container;
 use Symfony\Component\Console\Application;
-use PhpLab\Core\Console\Helpers\CommandHepler;
+use PhpLab\Core\Console\Helpers\CommandHelper;
 
 /**
  * @var Application $application
@@ -38,7 +38,7 @@ $container->bind(\PhpLab\Dev\Package\Domain\Repositories\File\GroupRepository::c
 $container->bind(\PhpLab\Dev\Package\Domain\Interfaces\Repositories\PackageRepositoryInterface::class, \PhpLab\Dev\Package\Domain\Repositories\File\PackageRepository::class);
 $container->bind(\PhpLab\Dev\Package\Domain\Interfaces\Repositories\GitRepositoryInterface::class, \PhpLab\Dev\Package\Domain\Repositories\File\GitRepository::class);
 
-CommandHepler::registerFromNamespaceList([
+CommandHelper::registerFromNamespaceList([
     'PhpLab\Dev\Generator\Commands',
     'PhpLab\Dev\Stress\Commands',
     'PhpLab\Dev\Package\Commands',
