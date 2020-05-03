@@ -80,7 +80,14 @@ class GitRepository implements GitRepositoryInterface
     {
         $git = new GitShell($packageEntity->getDirectory());
         $commits = $git->getCommits();
-        $commitCollection = EntityHelper::createEntityCollection(CommitEntity::class, $commits);
+        $fieldsOnly = [
+            "sha",
+            "merge",
+            "author",
+            "date",
+            "message",
+        ];
+        $commitCollection = EntityHelper::createEntityCollection(CommitEntity::class, $commits, $fieldsOnly);
         return $commitCollection;
     }
 
