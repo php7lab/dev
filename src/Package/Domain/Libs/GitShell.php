@@ -375,6 +375,7 @@ class GitShell extends BaseShell
         $outputLines = null;
         $lastLine = exec('git status', $outputLines);
         $this->end();
+        //dd($outputLines);
         return $this->searchText($outputLines, ['nothing to commit', 'нет изменений добавленных для коммита']);
         //return (strpos($lastLine, 'nothing to commit')) === false; // FALSE => changes
     }
