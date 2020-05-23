@@ -2,6 +2,8 @@
 
 namespace PhpLab\Dev\Package\Domain\Helpers;
 
+use PhpLab\Core\Legacy\Yii\Helpers\FileHelper;
+
 class PackageHelper
 {
 
@@ -14,9 +16,14 @@ class PackageHelper
     public static function pathByNamespace($namespace)
     {
         $nsArray = PackageHelper::findPathByNamespace($namespace);
-        $partName = mb_substr($namespace, mb_strlen($nsArray['namespace']));
-        $partName = trim($partName, '\\');
-        $fileName = $nsArray['path'] . '\\' . $partName;
+        if($nsArray) {
+            $partName = mb_substr($namespace, mb_strlen($nsArray['namespace']));
+            $partName = trim($partName, '\\');
+            $fileName = $nsArray['path'] . '\\' . $partName;
+        } else {
+            $fileName = FileHelper::rootPath() . '\\' . $namespace;
+        }
+        $fileName = str_replace('\\', '/', $fileName);
         return $fileName;
     }
 
