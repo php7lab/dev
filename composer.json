@@ -9,6 +9,9 @@
     }
   ],
   "minimum-stability": "dev",
+  "require": {
+    "symfony/var-dumper": "4.*"
+  },
   "require-dev": {
     "zendframework/zend-code": "^3.3.0"
   },
