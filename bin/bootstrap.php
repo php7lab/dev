@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Container\Container;
 use Symfony\Component\Console\Application;
 use PhpLab\Core\Console\Helpers\CommandHelper;
