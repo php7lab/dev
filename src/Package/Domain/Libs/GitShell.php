@@ -373,17 +373,22 @@ class GitShell extends BaseShell
     {
         $this->begin();
         $outputLines = null;
-        $lastLine = exec('git status', $outputLines);
+        $lastLine = exec('LANG=en_GB git status', $outputLines);
         $this->end();
         //dd($outputLines);
-        return $this->searchText($outputLines, ['nothing to commit', 'нет изменений добавленных для коммита']);
+        if($this->searchText($outputLines, ['Changes not staged for commit:', 'Untracked files:', '"git add"'])) {
+            return true;
+        }
+        //dd($outputLines);
+        //return $this->searchText($outputLines, ['nothing to commit']);
         //return (strpos($lastLine, 'nothing to commit')) === false; // FALSE => changes
+        return false;
     }
 
     private function searchText(array $lines, $needles) {
         foreach ($lines as $line) {
             foreach ($needles as $needle) {
-                $isHas = strpos($line, $needle) !== false;
+                $isHas = strpos(mb_strtolower($line), mb_strtolower($needle)) !== false;
                 if($isHas) {
                     return true;
                 }

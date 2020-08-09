@@ -92,7 +92,13 @@ class GitService extends BaseService implements GitServiceInterface
 
     public function isHasChanges(PackageEntity $packageEntity): bool
     {
-        return $this->repository->isHasChanges($packageEntity);
+        $isHas = $this->repository->isHasChanges($packageEntity);
+//        dd($packageEntity->getId());
+        if($packageEntity->getName() == 'messenger') {
+            //dd($isHas);
+        }
+
+        return $isHas;
     }
 
     public function allChanged()
