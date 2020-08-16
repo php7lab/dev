@@ -32,6 +32,7 @@ class Packager
         $phar->setStub($stubCode);
         $phar->stopBuffering();
         //$phar->buildFromDirectory($sourcePath);
+
         return $phar;
     }
 
@@ -49,6 +50,13 @@ class Packager
         $fileList = $this->getFiles($sourcePath, $excludes);
         $arrayIterator = new ArrayIterator($fileList);
         $phar = $this->createPhar($sourcePath, $outPath, $arrayIterator);
+        //$this->gZipEncode($outPath);
+    }
+
+    private function gZipEncode($outPath) {
+        $outPathGzip = $outPath . '.gz';
+        $encodedData = gzencode(file_get_contents($outPath), 9);
+        file_put_contents($outPathGzip, $encodedData);
     }
 
     private function updateBaseDir(Phar $phar, string $file)
